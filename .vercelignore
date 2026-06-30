@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.local
+dist
+.expo
+.next
+coverage
+.DS_Store
+npm-debug.log
+yarn-error.log
