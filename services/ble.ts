@@ -1,5 +1,7 @@
 import { BleManager, Device } from 'react-native-ble-plx';
 import type { Impact } from './mockImpacts';
+import { logger } from '../utils/logger';
+import { validateImpact, sanitizeImpact } from '../utils/validation';
 
 const manager = new BleManager();
 
@@ -20,10 +22,12 @@ export class HelmetBLE {
 
   async startScan(): Promise<Device[]> {
     const discovered: Device[] = [];
+    logger.debug('BLE', 'Starting device scan');
 
     return new Promise((resolve, reject) => {
       manager.startDeviceScan([HELMET_SERVICE_UUID], null, (error, device) => {
         if (error) {
+          logger.error('BLE', 'Scan error', error);
           reject(error);
           return;
         }
@@ -31,6 +35,7 @@ export class HelmetBLE {
         if (device?.isConnectable) {
           const exists = discovered.find(d => d.id === device.id);
           if (!exists) {
+            logger.debug('BLE', `Found device: ${device.name || device.id}`);
             discovered.push(device);
           }
         }
@@ -38,6 +43,7 @@ export class HelmetBLE {
 
       setTimeout(() => {
         manager.stopDeviceScan();
+        logger.info('BLE', `Scan complete. Found ${discovered.length} devices`);
         resolve(discovered);
       }, 10000);
     });
@@ -45,13 +51,16 @@ export class HelmetBLE {
 
   async connect(device: Device): Promise<void> {
     try {
+      logger.info('BLE', `Connecting to ${device.name || device.id}`);
       const connected = await device.connect();
       this.device = connected;
 
+      logger.debug('BLE', 'Discovering services and characteristics');
       await connected.discoverAllServicesAndCharacteristics();
       await this.subscribeToImpacts();
+      logger.info('BLE', 'Connection established and subscribed');
     } catch (error) {
-      console.error('Connection failed:', error);
+      logger.error('BLE', 'Connection failed', error);
       throw error;
     }
   }
@@ -60,25 +69,36 @@ export class HelmetBLE {
     if (!this.device) return;
 
     try {
+      logger.debug('BLE', 'Subscribing to impact characteristic');
       this.device.monitorCharacteristicForService(
         HELMET_SERVICE_UUID,
         IMPACT_CHARACTERISTIC_UUID,
         (error, char) => {
           if (error) {
-            console.error('Monitor error:', error);
+            logger.error('BLE', 'Monitor error', error);
             return;
           }
 
           if (char?.value) {
-            const impact = this.decodeImpact(Buffer.from(char.value, 'base64'));
-            if (this.onImpact) {
-              this.onImpact(impact);
+            try {
+              const impact = this.decodeImpact(Buffer.from(char.value, 'base64'));
+              if (validateImpact(impact)) {
+                const sanitized = sanitizeImpact(impact) as Impact;
+                logger.debug('BLE', `Received impact: ${sanitized.gForce}G`);
+                if (this.onImpact) {
+                  this.onImpact(sanitized);
+                }
+              } else {
+                logger.warn('BLE', 'Invalid impact data received');
+              }
+            } catch (decodeError) {
+              logger.error('BLE', 'Failed to decode impact', decodeError);
             }
           }
         }
       );
     } catch (error) {
-      console.error('Subscribe error:', error);
+      logger.error('BLE', 'Subscribe error', error);
     }
   }
 
@@ -105,10 +125,12 @@ export class HelmetBLE {
   async disconnect(): Promise<void> {
     if (this.device) {
       try {
+        logger.info('BLE', 'Disconnecting');
         await this.device.cancelConnection();
         this.device = null;
+        logger.info('BLE', 'Disconnected');
       } catch (error) {
-        console.error('Disconnect error:', error);
+        logger.error('BLE', 'Disconnect error', error);
       }
     }
   }

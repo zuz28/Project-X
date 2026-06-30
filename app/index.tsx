@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { useStore } from '../store';
 import { useHelmet } from '../hooks/useHelmet';
 import { generateSession } from '../services/mockImpacts';
+import { ImpactChart } from '../components/ImpactChart';
+import { calculateSessionStats, formatDuration } from '../utils/analytics';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -34,9 +36,8 @@ export default function HomeScreen() {
     );
   }
 
-  const maxImpact = currentSession.impacts.reduce((max, impact) =>
-    impact.gForce > max ? impact.gForce : max, 0);
-  const flaggedCount = currentSession.impacts.filter(i => i.flagged).length;
+  const stats = calculateSessionStats(currentSession);
+  const sessionDuration = formatDuration(stats.duration);
 
   return (
     <ScrollView style={styles.container}>
@@ -45,19 +46,23 @@ export default function HomeScreen() {
         <Text style={styles.subtitle}>Session #{currentSession.id.substring(0, 8)}</Text>
       </View>
 
-      <View style={styles.statsCard}>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Impacts</Text>
-          <Text style={styles.statValue}>{currentSession.impacts.length}</Text>
+      <View style={styles.statsGrid}>
+        <View style={styles.statSmall}>
+          <Text style={styles.statSmallLabel}>Impacts</Text>
+          <Text style={styles.statSmallValue}>{stats.totalImpacts}</Text>
         </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Max G-Force</Text>
-          <Text style={styles.statValue}>{maxImpact.toFixed(1)}G</Text>
+        <View style={styles.statSmall}>
+          <Text style={styles.statSmallLabel}>Max G</Text>
+          <Text style={styles.statSmallValue}>{stats.maxGForce.toFixed(1)}</Text>
         </View>
-        <View style={styles.stat}>
-          <Text style={styles.statLabel}>Flagged</Text>
-          <Text style={[styles.statValue, flaggedCount > 0 && styles.warning]}>
-            {flaggedCount}
+        <View style={styles.statSmall}>
+          <Text style={styles.statSmallLabel}>Avg G</Text>
+          <Text style={styles.statSmallValue}>{stats.avgGForce.toFixed(1)}</Text>
+        </View>
+        <View style={styles.statSmall}>
+          <Text style={styles.statSmallLabel}>Risk</Text>
+          <Text style={[styles.statSmallValue, stats.flaggedCount > 0 && styles.warning]}>
+            {stats.flaggedCount}
           </Text>
         </View>
       </View>
@@ -74,6 +79,30 @@ export default function HomeScreen() {
       <TouchableOpacity style={styles.buttonSecondary} onPress={handleStartSession}>
         <Text style={styles.buttonSecondaryText}>Start New Session</Text>
       </TouchableOpacity>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Impact Distribution</Text>
+        <ImpactChart impacts={currentSession.impacts} />
+      </View>
+
+      <View style={styles.section}>
+        <View style={styles.sessionInfo}>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>Duration</Text>
+            <Text style={styles.infoValue}>{sessionDuration}</Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>Severity</Text>
+            <Text style={[styles.infoValue, styles[`severity_${stats.severity}`]]}>
+              {stats.severity.charAt(0).toUpperCase() + stats.severity.slice(1)}
+            </Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoLabel}>Risk %</Text>
+            <Text style={styles.infoValue}>{stats.riskPercentage.toFixed(0)}%</Text>
+          </View>
+        </View>
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Recent Impacts</Text>
@@ -136,28 +165,27 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 5,
   },
-  statsCard: {
+  statsGrid: {
     flexDirection: 'row',
     margin: 20,
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    gap: 12,
   },
-  stat: {
+  statSmall: {
     flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
     alignItems: 'center',
   },
-  statLabel: {
-    fontSize: 12,
+  statSmallLabel: {
+    fontSize: 11,
     color: '#666',
-    marginBottom: 8,
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    fontWeight: '500',
   },
-  statValue: {
-    fontSize: 24,
+  statSmallValue: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1a1a1a',
   },
@@ -238,5 +266,36 @@ const styles = StyleSheet.create({
     color: '#007AFF',
     fontSize: 14,
     fontWeight: '600',
+  },
+  sessionInfo: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    justifyContent: 'space-around',
+  },
+  infoItem: {
+    alignItems: 'center',
+  },
+  infoLabel: {
+    fontSize: 11,
+    color: '#666',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1a1a1a',
+  },
+  severity_low: {
+    color: '#34C759',
+  },
+  severity_moderate: {
+    color: '#ffc107',
+  },
+  severity_high: {
+    color: '#ff6b6b',
   },
 });
