@@ -8,6 +8,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build": "expo export --platform web",
+    "build:static": "expo export --platform web --output-dir dist",
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx"
   },
