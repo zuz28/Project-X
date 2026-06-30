@@ -27,6 +27,7 @@ export default function RootLayout() {
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="history" />
+      <Stack.Screen name="analytics" />
       <Stack.Screen name="alerts" />
       <Stack.Screen name="pair" />
       <Stack.Screen name="account" />
