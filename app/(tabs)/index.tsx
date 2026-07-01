@@ -8,7 +8,7 @@ import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../s
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { currentSession, setCurrentSession, isConnected, connectedDeviceName } = useStore();
+  const { currentSession, setCurrentSession, isConnected, connectedDeviceName, user } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -111,6 +111,14 @@ export default function HomeScreen() {
           >
             <Text style={styles.insightsButtonIcon}>💡</Text>
             <Text style={styles.insightsButtonText}>Health Insights</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.helmetButton}
+            onPress={() => router.push('/helmet')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.helmetButtonIcon}>🪖</Text>
+            <Text style={styles.helmetButtonText}>Your Helmets</Text>
           </TouchableOpacity>
         </View>
 
@@ -300,6 +308,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   insightsButtonText: {
+    color: Colors.primary,
+    fontSize: Typography.size.base,
+    fontWeight: '600',
+  },
+  helmetButton: {
+    backgroundColor: Colors.background,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Spacing.md,
+  },
+  helmetButtonIcon: {
+    fontSize: 16,
+  },
+  helmetButtonText: {
     color: Colors.primary,
     fontSize: Typography.size.base,
     fontWeight: '600',

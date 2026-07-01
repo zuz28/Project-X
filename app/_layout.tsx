@@ -8,14 +8,16 @@ import { bleService } from '../services/ble';
 import { ImpactAlert } from '../components/ImpactAlert';
 
 export default function RootLayout() {
-  const { setSessions, addImpact, currentSession } = useStore();
+  const { isAuthenticated, setSessions, addImpact, currentSession } = useStore();
   const [lastImpact, setLastImpact] = useState<any>(null);
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    loadSessions();
-    setupBLEListener();
-  }, []);
+    if (isAuthenticated) {
+      loadSessions();
+      setupBLEListener();
+    }
+  }, [isAuthenticated]);
 
   const loadSessions = async () => {
     try {
@@ -27,7 +29,6 @@ export default function RootLayout() {
   };
 
   const setupBLEListener = () => {
-    // Listen for incoming impact data from BLE
     const unsubscribe = bleService.onImpact((impactData) => {
       if (currentSession) {
         const impact = {
@@ -35,7 +36,7 @@ export default function RootLayout() {
           timestamp: impactData.timestamp,
           gForce: impactData.gForce,
           rotational: impactData.rotational,
-          flagged: impactData.gForce > 50, // Flag high impacts automatically
+          flagged: impactData.gForce > 50,
         };
 
         addImpact(impact);
@@ -57,45 +58,27 @@ export default function RootLayout() {
           animationTypeForReplace: 'fade',
         }}
       >
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen
-          name="impact/[id]"
-          options={{
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="connect"
-          options={{
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="settings"
-          options={{
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="onboarding"
-          options={{
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="session/[id]"
-          options={{
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="insights"
-          options={{
-            animation: 'slide_from_bottom',
-          }}
-        />
+        {!isAuthenticated ? (
+          // Auth Stack
+          <Stack.Group>
+            <Stack.Screen name="auth/login" />
+            <Stack.Screen name="auth/signup" options={{ animationTypeForReplace: 'fade' }} />
+            <Stack.Screen name="auth/forgot-password" options={{ animationTypeForReplace: 'fade' }} />
+          </Stack.Group>
+        ) : (
+          // App Stack
+          <Stack.Group>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="impact/[id]" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="connect" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="settings" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="helmet" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="session/[id]" options={{ animation: 'slide_from_bottom' }} />
+            <Stack.Screen name="insights" options={{ animation: 'slide_from_bottom' }} />
+          </Stack.Group>
+        )}
       </Stack>
-      {lastImpact && (
+      {lastImpact && isAuthenticated && (
         <ImpactAlert
           gForce={lastImpact.gForce}
           timestamp={lastImpact.timestamp}
