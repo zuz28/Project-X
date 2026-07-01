@@ -36,15 +36,7 @@ export default function HomeScreen() {
     router.push('/connect');
   };
 
-  if (!currentSession) {
-    return (
-      <View style={[styles.container, styles.center]}>
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
-    );
-  }
-
-  // Memoize stats calculations
+  // Memoize stats calculations (must run before any early return — Rules of Hooks)
   const { maxG, flaggedCount, avgG } = useMemo(() => {
     const impacts = currentSession?.impacts || [];
     return {
@@ -55,6 +47,14 @@ export default function HomeScreen() {
         : '0',
     };
   }, [currentSession?.impacts]);
+
+  if (!currentSession) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>

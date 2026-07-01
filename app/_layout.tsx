@@ -87,33 +87,22 @@ export default function RootLayout() {
       }}
     >
       <View style={{ flex: 1 }}>
-        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        <StatusBar style="dark" />
         <Stack
           screenOptions={{
             headerShown: false,
-            animationEnabled: true,
-            animationTypeForReplace: 'fade',
           }}
         >
-          {!isAuthenticated ? (
-            // Auth Stack
-            <Stack.Group>
-              <Stack.Screen name="auth/login" />
-              <Stack.Screen name="auth/signup" options={{ animationTypeForReplace: 'fade' }} />
-              <Stack.Screen name="auth/forgot-password" options={{ animationTypeForReplace: 'fade' }} />
-            </Stack.Group>
-          ) : (
-            // App Stack
-            <Stack.Group>
-              <Stack.Screen name="(tabs)" />
-              <Stack.Screen name="impact/[id]" options={{ animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="connect" options={{ animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="settings" options={{ animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="helmet" options={{ animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="session/[id]" options={{ animation: 'slide_from_bottom' }} />
-              <Stack.Screen name="insights" options={{ animation: 'slide_from_bottom' }} />
-            </Stack.Group>
-          )}
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="auth/login" />
+          <Stack.Screen name="auth/signup" />
+          <Stack.Screen name="auth/forgot-password" />
+          <Stack.Screen name="impact/[id]" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="connect" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="settings" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="helmet" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="session/[id]" options={{ animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="insights" options={{ animation: 'slide_from_bottom' }} />
         </Stack>
         {lastImpact && isAuthenticated && (
           <ImpactAlert
