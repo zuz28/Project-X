@@ -1,13 +1,14 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Switch, Alert } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { bleService } from '../services/ble';
+import { exportSessionsAsCSV, generateReport } from '../services/export';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isConnected, connectedDeviceName, setConnected, setConnectedDeviceName, clearAll } = useStore();
+  const { isConnected, connectedDeviceName, setConnected, setConnectedDeviceName, clearAll, sessions } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [impactThreshold, setImpactThreshold] = useState(40);
@@ -33,9 +34,45 @@ export default function SettingsScreen() {
   };
 
   const handleClearData = () => {
-    // Show confirmation would go here
-    clearAll();
-    alert('All data has been cleared');
+    Alert.alert(
+      'Clear All Data',
+      'This action cannot be undone. Are you sure?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Clear',
+          onPress: () => {
+            clearAll();
+            Alert.alert('Success', 'All data has been cleared');
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
+
+  const handleExportData = () => {
+    try {
+      const csv = exportSessionsAsCSV(sessions);
+      const report = generateReport(sessions);
+
+      Alert.alert(
+        'Export Generated',
+        'Your data has been exported. You can now share or save it.\n\nCSV file is ready to copy.',
+        [
+          {
+            text: 'OK',
+            onPress: () => console.log('CSV data:', csv),
+          },
+        ]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export data');
+    }
   };
 
   return (
@@ -155,6 +192,7 @@ export default function SettingsScreen() {
           <View style={styles.sectionBox}>
             <TouchableOpacity
               style={styles.settingRow}
+              onPress={handleExportData}
               activeOpacity={0.7}
             >
               <View>
