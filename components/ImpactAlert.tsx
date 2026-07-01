@@ -77,10 +77,10 @@ export function ImpactAlert({ gForce, timestamp, visible }: ImpactAlertProps) {
           {isCritical ? '🚨' : isHigh ? '⚠️' : '📊'}
         </Text>
         <View style={styles.content}>
-          <Text style={styles.title}>Impact Detected</Text>
-          <Text style={styles.gForce}>{gForce}G</Text>
+          <Text style={[styles.title, (isCritical || isHigh) && styles.lightText]}>Impact Detected</Text>
+          <Text style={[styles.gForce, (isCritical || isHigh) && styles.lightText]}>{gForce}G</Text>
         </View>
-        <Text style={styles.severity}>
+        <Text style={[styles.severity, (isCritical || isHigh) && styles.lightSeverity]}>
           {isCritical ? 'Critical' : isHigh ? 'High' : 'Normal'}
         </Text>
       </View>
@@ -112,8 +112,15 @@ const styles = StyleSheet.create({
     borderLeftColor: Colors.accentRed,
   },
   alertHigh: {
-    backgroundColor: '#FF9500',
-    borderLeftColor: '#FF9500',
+    backgroundColor: Colors.accentOrange,
+    borderLeftColor: Colors.accentOrange,
+  },
+  lightText: {
+    color: Colors.background,
+  },
+  lightSeverity: {
+    color: Colors.background,
+    opacity: 0.9,
   },
   icon: {
     fontSize: 24,

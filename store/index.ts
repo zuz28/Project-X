@@ -30,6 +30,7 @@ interface AppState {
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
+  clearAll: () => void;
 
   // Session/Impact tracking
   sessions: Session[];
@@ -64,6 +65,16 @@ export const useStore = create<AppState>((set) => ({
     isConnected: false,
     connectedDeviceName: null,
     connectedHelmetId: null,
+  }),
+  clearAll: () => set({
+    user: null,
+    isAuthenticated: false,
+    sessions: [],
+    currentSession: null,
+    isConnected: false,
+    connectedDeviceName: null,
+    connectedHelmetId: null,
+    lastImpactTime: null,
   }),
 
   // Sessions

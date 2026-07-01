@@ -32,7 +32,7 @@ export default function RootLayout() {
       const sessions = await getSessions();
       setSessions(sessions);
     } catch (error) {
-      console.error('Failed to load sessions:', error);
+      logger.error('Failed to load sessions', error, 'APP');
     }
   };
 
@@ -55,6 +55,13 @@ export default function RootLayout() {
 
     return () => unsubscribe();
   };
+
+  useEffect(() => {
+    if (showAlert) {
+      const timer = setTimeout(() => setShowAlert(false), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlert]);
 
   return (
     <ErrorBoundary

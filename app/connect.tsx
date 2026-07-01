@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { bleService, BluetoothDevice } from '../services/ble';
 import { helmetService } from '../services/helmet';
+import { logger } from '../utils/logger';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
 
 export default function ConnectScreen() {
@@ -91,7 +92,7 @@ export default function ConnectScreen() {
         ]
       );
     } catch (error) {
-      console.error('Connection failed:', error);
+      logger.error('Helmet connection failed', error, 'CONNECT');
       Alert.alert('Connection Failed', 'Unable to pair helmet. Please try again.');
       setConnectingTo(null);
     }

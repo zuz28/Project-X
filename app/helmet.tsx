@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
@@ -10,6 +10,8 @@ export default function HelmetScreen() {
   const { connectedHelmetId } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [helmets, setHelmets] = useState<Helmet[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -21,15 +23,86 @@ export default function HelmetScreen() {
     loadHelmets();
   }, []);
 
-  const loadHelmets = () => {
-    const allHelmets = helmetService.getAllHelmets();
-    setHelmets(allHelmets);
+  const loadHelmets = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const allHelmets = helmetService.getAllHelmets();
+      setHelmets(allHelmets);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load helmets');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getHelmetHealth = (helmet: Helmet) => {
     const health = helmetService.getHelmetHealth(helmet.id);
     return health;
   };
+
+  if (loading) {
+    return (
+      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.closeButton}>✕</Text>
+            </TouchableOpacity>
+            <View style={styles.headerContent}>
+              <Text style={styles.headerTitle}>Your Helmets</Text>
+            </View>
+          </View>
+          <View style={[styles.container, styles.emptyContainer]}>
+            <Text style={styles.emptyDescription}>Loading helmets...</Text>
+          </View>
+        </ScrollView>
+      </Animated.View>
+    );
+  }
+
+  if (error) {
+    return (
+      <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.closeButton}>✕</Text>
+            </TouchableOpacity>
+            <View style={styles.headerContent}>
+              <Text style={styles.headerTitle}>Your Helmets</Text>
+            </View>
+          </View>
+          <View style={[styles.container, styles.emptyContainer]}>
+            <Text style={styles.emptyIcon}>⚠️</Text>
+            <Text style={styles.emptyTitle}>Error</Text>
+            <Text style={styles.emptyDescription}>{error}</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={loadHelmets}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.buttonText}>Try Again</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </Animated.View>
+    );
+  }
 
   if (helmets.length === 0) {
     return (

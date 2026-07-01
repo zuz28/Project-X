@@ -165,6 +165,7 @@ export default function ImpactDetailScreen() {
             </Text>
             <TouchableOpacity
               style={styles.viewSessionButton}
+              onPress={() => router.back()}
               activeOpacity={0.7}
             >
               <Text style={styles.viewSessionButtonText}>View Full Session</Text>
@@ -286,13 +287,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
   },
   detailLabel: {
     fontSize: Typography.size.base,

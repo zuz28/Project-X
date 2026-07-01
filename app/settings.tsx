@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { bleService } from '../services/ble';
 import { exportSessionsAsCSV, generateReport } from '../services/export';
+import { logger } from '../utils/logger';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
 
 export default function SettingsScreen() {
@@ -91,7 +92,7 @@ export default function SettingsScreen() {
         [
           {
             text: 'OK',
-            onPress: () => console.log('CSV data:', csv),
+            onPress: () => logger.info('Data exported successfully', {}, 'SETTINGS'),
           },
         ]
       );
@@ -247,9 +248,9 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Danger Zone */}
+        {/* Sign Out */}
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, styles.dangerTitle]}>Account</Text>
+          <Text style={[styles.sectionTitle, styles.dangerTitle]}>Sign Out</Text>
           <View style={[styles.sectionBox, styles.dangerBox]}>
             <TouchableOpacity
               style={styles.dangerButton}
