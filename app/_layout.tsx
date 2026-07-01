@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { useStore } from '../store';
 import { getSessions } from '../services/storage';
 import { bleService } from '../services/ble';
+import { crashReportingService } from '../services/crashReporting';
 import { ImpactAlert } from '../components/ImpactAlert';
 import { NetworkStatusBar } from '../components/NetworkStatusBar';
 import { ErrorBoundary } from '../utils/errorBoundary';
@@ -16,9 +17,13 @@ export default function RootLayout() {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
+    // Initialize crash reporting
+    crashReportingService.initialize('https://your-sentry-dsn@sentry.io/project-id');
+
     if (isAuthenticated) {
       loadSessions();
       setupBLEListener();
+      logger.info('App authenticated', {}, 'APP');
     }
   }, [isAuthenticated]);
 
