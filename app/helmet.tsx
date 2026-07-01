@@ -216,8 +216,8 @@ export default function HelmetScreen() {
               {/* Usage Stats */}
               <View style={styles.statsBox}>
                 <StatCard label="Total Impacts" value={helmet.totalImpacts.toString()} />
-                <StatCard label="Battery" value={`${health?.battery}`} />
-                <StatCard label="Connection" value={health?.connection} />
+                <StatCard label="Battery" value={health?.battery ?? 'N/A'} />
+                <StatCard label="Connection" value={health?.connection ?? 'Inactive'} />
               </View>
 
               {/* Recommendations */}

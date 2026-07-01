@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Switch, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
@@ -6,6 +7,8 @@ import { bleService } from '../services/ble';
 import { exportSessionsAsCSV, generateReport } from '../services/export';
 import { logger } from '../utils/logger';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
+
+const SETTINGS_KEY = '@vela_settings';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -45,7 +48,34 @@ export default function SettingsScreen() {
       duration: Animation.normal,
       useNativeDriver: true,
     }).start();
+
+    // Load settings from AsyncStorage
+    loadSettings();
   }, []);
+
+  const loadSettings = async () => {
+    try {
+      const settings = await AsyncStorage.getItem(SETTINGS_KEY);
+      if (settings) {
+        const { notificationsEnabled: saved_notifications, impactThreshold: saved_threshold } = JSON.parse(settings);
+        if (saved_notifications !== undefined) setNotificationsEnabled(saved_notifications);
+        if (saved_threshold !== undefined) setImpactThreshold(saved_threshold);
+      }
+    } catch (error) {
+      logger.error('Failed to load settings', error, 'SETTINGS');
+    }
+  };
+
+  const saveSettings = async (notifications: boolean, threshold: number) => {
+    try {
+      await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({
+        notificationsEnabled: notifications,
+        impactThreshold: threshold,
+      }));
+    } catch (error) {
+      logger.error('Failed to save settings', error, 'SETTINGS');
+    }
+  };
 
   const handleDisconnect = async () => {
     setIsDisconnecting(true);
@@ -192,7 +222,10 @@ export default function SettingsScreen() {
               </View>
               <Switch
                 value={notificationsEnabled}
-                onValueChange={setNotificationsEnabled}
+                onValueChange={(value) => {
+                  setNotificationsEnabled(value);
+                  saveSettings(value, impactThreshold);
+                }}
                 trackColor={{ false: Colors.border, true: Colors.accentGreen }}
                 thumbColor={Colors.background}
               />
@@ -213,7 +246,10 @@ export default function SettingsScreen() {
                     styles.thresholdButton,
                     impactThreshold === threshold && styles.thresholdButtonActive,
                   ]}
-                  onPress={() => setImpactThreshold(threshold)}
+                  onPress={() => {
+                    setImpactThreshold(threshold);
+                    saveSettings(notificationsEnabled, threshold);
+                  }}
                   activeOpacity={0.7}
                 >
                   <Text

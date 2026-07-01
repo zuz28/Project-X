@@ -58,8 +58,13 @@ export default function ConnectScreen() {
 
     setConnectingTo(selectedDevice.id);
     try {
-      // Connect via BLE
-      await bleService.connectToDevice(selectedDevice.id, selectedDevice.name);
+      // Connect via BLE with 30 second timeout
+      const connectionPromise = bleService.connectToDevice(selectedDevice.id, selectedDevice.name);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timeout - device not responding')), 30000)
+      );
+
+      await Promise.race([connectionPromise, timeoutPromise]);
 
       // Pair helmet in our system
       const helmet = await helmetService.pairHelmet(

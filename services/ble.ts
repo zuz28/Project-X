@@ -1,4 +1,5 @@
 import { NativeEventEmitter, Platform } from 'react-native';
+import { logger } from '../utils/logger';
 
 // BLE Service for Helmet Connectivity
 // Manages device discovery, pairing, and real-time impact data streaming
@@ -37,19 +38,19 @@ class BLEService {
     // - or expo-ble-upm for Expo-managed version
 
     // For now, simulate device discovery
-    console.log('[BLE] Starting device scan...');
+    logger.info('Starting device scan', {}, 'BLE');
   }
 
   // Stop scanning
   async stopScanning(): Promise<void> {
     this.isScanning = false;
-    console.log('[BLE] Stopped scanning');
+    logger.info('Stopped scanning', {}, 'BLE');
   }
 
   // Connect to a specific device
   async connectToDevice(deviceId: string, deviceName: string): Promise<void> {
     try {
-      console.log(`[BLE] Connecting to ${deviceName}...`);
+      logger.info(`Connecting to ${deviceName}`, { deviceId }, 'BLE');
 
       // Simulate connection delay
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -64,9 +65,9 @@ class BLEService {
       // Start listening for impact data
       this.startDataStream();
 
-      console.log(`[BLE] Connected to ${deviceName}`);
+      logger.info(`Connected to ${deviceName}`, { deviceId }, 'BLE');
     } catch (error) {
-      console.error('[BLE] Connection failed:', error);
+      logger.error(`Connection failed to ${deviceName}`, error, 'BLE');
       throw error;
     }
   }
@@ -79,7 +80,7 @@ class BLEService {
     }
 
     if (this.connectedDevice) {
-      console.log(`[BLE] Disconnected from ${this.connectedDevice.name}`);
+      logger.info(`Disconnected from ${this.connectedDevice.name}`, {}, 'BLE');
       this.connectedDevice.isConnected = false;
       this.connectedDevice = null;
     }
@@ -123,7 +124,7 @@ class BLEService {
       try {
         listener(data);
       } catch (error) {
-        console.error('[BLE] Listener error:', error);
+        logger.error('Listener error', error, 'BLE');
       }
     });
   }

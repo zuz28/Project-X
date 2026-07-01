@@ -1,5 +1,6 @@
 // Network status detection and connectivity management
 import { Platform } from 'react-native';
+import { logger } from '../utils/logger';
 
 type NetworkListener = (isOnline: boolean) => void;
 
@@ -66,7 +67,7 @@ class NetworkService {
       try {
         listener(this.isOnline);
       } catch (error) {
-        console.error('Network listener error:', error);
+        logger.error('Network listener error', error, 'NETWORK');
       }
     });
   }

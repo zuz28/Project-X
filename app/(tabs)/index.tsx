@@ -44,9 +44,13 @@ export default function HomeScreen() {
     );
   }
 
-  const maxG = Math.max(...currentSession.impacts.map(i => i.gForce), 50);
+  const maxG = currentSession.impacts.length > 0
+    ? Math.max(...currentSession.impacts.map(i => i.gForce))
+    : 0;
   const flaggedCount = currentSession.impacts.filter(i => i.flagged).length;
-  const avgG = (currentSession.impacts.reduce((sum, i) => sum + i.gForce, 0) / currentSession.impacts.length).toFixed(1);
+  const avgG = currentSession.impacts.length > 0
+    ? (currentSession.impacts.reduce((sum, i) => sum + i.gForce, 0) / currentSession.impacts.length).toFixed(1)
+    : '0';
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>

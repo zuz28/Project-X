@@ -1,6 +1,8 @@
 // Authentication Service
 // Handles user registration, login, and password recovery with email verification
 
+import { logger } from '../utils/logger';
+
 export interface User {
   id: string;
   email: string;
@@ -42,7 +44,7 @@ class AuthService {
     this.verificationCodes.set(email, verification);
 
     // Simulate email send
-    console.log(`[EMAIL] Verification code for ${email}: ${code}`);
+    logger.info(`Verification code sent to ${email}`, { code }, 'AUTH');
   }
 
   // Verify code and create account

@@ -77,7 +77,9 @@ export default function HistoryScreen() {
                 <View style={styles.statBadge}>
                   <Text style={styles.statLabel}>Max G</Text>
                   <Text style={styles.statValue}>
-                    {Math.max(...session.impacts.map(i => i.gForce), 50).toFixed(1)}
+                    {session.impacts.length > 0
+                      ? Math.max(...session.impacts.map(i => i.gForce)).toFixed(1)
+                      : '0'}
                   </Text>
                 </View>
                 <View style={styles.statBadge}>

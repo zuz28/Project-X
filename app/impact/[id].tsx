@@ -22,6 +22,11 @@ export default function ImpactDetailScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Validate id is a string
+    if (typeof id !== 'string') {
+      return;
+    }
+
     // Find the impact across all sessions
     const foundImpact = sessions
       .flatMap(session =>

@@ -12,6 +12,11 @@ export default function SessionDetailScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Validate id is a string
+    if (typeof id !== 'string') {
+      return;
+    }
+
     const foundSession = sessions.find(s => s.id === id);
     if (foundSession) {
       setSession(foundSession);

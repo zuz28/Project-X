@@ -17,13 +17,21 @@ export default function RootLayout() {
   const [showAlert, setShowAlert] = useState(false);
 
   useEffect(() => {
-    // Initialize crash reporting
-    crashReportingService.initialize('https://your-sentry-dsn@sentry.io/project-id');
+    // Initialize crash reporting (requires Sentry DSN in environment)
+    const sentryDSN = process.env.EXPO_PUBLIC_SENTRY_DSN;
+    if (sentryDSN) {
+      crashReportingService.initialize(sentryDSN);
+    } else {
+      logger.warn('Sentry DSN not configured - crash reporting disabled', {}, 'APP');
+    }
 
     if (isAuthenticated) {
       loadSessions();
-      setupBLEListener();
+      const unsubscribe = setupBLEListener();
       logger.info('App authenticated', {}, 'APP');
+
+      // Cleanup listener on unmount or auth change
+      return unsubscribe;
     }
   }, [isAuthenticated]);
 

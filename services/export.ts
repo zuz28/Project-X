@@ -1,4 +1,5 @@
 import { Session } from '../store';
+import { logger } from '../utils/logger';
 
 export function exportSessionsAsCSV(sessions: Session[]): string {
   const headers = [
@@ -71,7 +72,7 @@ ${sessions
     session => `
 Session: ${new Date(session.date).toLocaleString()}
 Impacts: ${session.impacts.length}
-Max G-Force: ${Math.max(...session.impacts.map(i => i.gForce)).toFixed(1)}G
+Max G-Force: ${session.impacts.length > 0 ? Math.max(...session.impacts.map(i => i.gForce)).toFixed(1) : '0'}G
 Flagged: ${session.impacts.filter(i => i.flagged).length}
 `
   )
@@ -113,6 +114,5 @@ export async function shareReport(sessions: Session[]): Promise<void> {
   const csv = exportSessionsAsCSV(sessions);
 
   // In a real app, this would use Share API
-  console.log('Report generated:', report);
-  console.log('CSV generated:', csv);
+  logger.info('Report and CSV generated', { reportLength: report.length, csvLength: csv.length }, 'EXPORT');
 }
