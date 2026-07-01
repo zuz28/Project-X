@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../../store';
 import { generateSession } from '../../services/mockData';
@@ -44,13 +44,17 @@ export default function HomeScreen() {
     );
   }
 
-  const maxG = currentSession.impacts.length > 0
-    ? Math.max(...currentSession.impacts.map(i => i.gForce))
-    : 0;
-  const flaggedCount = currentSession.impacts.filter(i => i.flagged).length;
-  const avgG = currentSession.impacts.length > 0
-    ? (currentSession.impacts.reduce((sum, i) => sum + i.gForce, 0) / currentSession.impacts.length).toFixed(1)
-    : '0';
+  // Memoize stats calculations
+  const { maxG, flaggedCount, avgG } = useMemo(() => {
+    const impacts = currentSession?.impacts || [];
+    return {
+      maxG: impacts.length > 0 ? Math.max(...impacts.map(i => i.gForce)) : 0,
+      flaggedCount: impacts.filter(i => i.flagged).length,
+      avgG: impacts.length > 0
+        ? (impacts.reduce((sum, i) => sum + i.gForce, 0) / impacts.length).toFixed(1)
+        : '0',
+    };
+  }, [currentSession?.impacts]);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
@@ -90,6 +94,10 @@ export default function HomeScreen() {
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
+            testID="connect-helmet-button"
+            accessible
+            accessibilityLabel={isConnected ? 'Helmet connected' : 'Connect helmet'}
+            accessibilityHint="Opens device pairing screen"
             style={[styles.primaryButton, isConnected && styles.primaryButtonConnected]}
             onPress={handleConnectPress}
             activeOpacity={0.7}
@@ -102,6 +110,9 @@ export default function HomeScreen() {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            testID="new-session-button"
+            accessible
+            accessibilityLabel="New session"
             style={styles.secondaryButton}
             onPress={handleNewSession}
             activeOpacity={0.7}
@@ -109,6 +120,9 @@ export default function HomeScreen() {
             <Text style={styles.secondaryButtonText}>New Session</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            testID="health-insights-button"
+            accessible
+            accessibilityLabel="Health insights"
             style={styles.insightsButton}
             onPress={() => router.push('/insights')}
             activeOpacity={0.7}
@@ -117,6 +131,9 @@ export default function HomeScreen() {
             <Text style={styles.insightsButtonText}>Health Insights</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            testID="your-helmets-button"
+            accessible
+            accessibilityLabel="Your helmets"
             style={styles.helmetButton}
             onPress={() => router.push('/helmet')}
             activeOpacity={0.7}

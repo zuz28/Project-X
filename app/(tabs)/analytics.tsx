@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useStore } from '../../store';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../styles/theme';
 
@@ -15,17 +15,23 @@ export default function AnalyticsScreen() {
     }).start();
   }, []);
 
-  // Calculate all-time statistics
-  const allImpacts = sessions.flatMap(s => s.impacts);
-  const totalImpacts = allImpacts.length;
-  const totalFlagged = allImpacts.filter(i => i.flagged).length;
-  const avgG = totalImpacts > 0 ? (allImpacts.reduce((sum, i) => sum + i.gForce, 0) / totalImpacts).toFixed(1) : '0';
-  const maxG = totalImpacts > 0 ? Math.max(...allImpacts.map(i => i.gForce)).toFixed(1) : '0';
-  const minG = totalImpacts > 0 ? Math.min(...allImpacts.map(i => i.gForce)).toFixed(1) : '0';
+  // Memoize analytics calculations
+  const { allImpacts, totalImpacts, totalFlagged, avgG, maxG, minG, avgImpactsPerSession, flaggedPercentage } = useMemo(() => {
+    const impacts = sessions.flatMap(s => s.impacts);
+    const total = impacts.length;
+    const flagged = impacts.filter(i => i.flagged).length;
 
-  // Session statistics
-  const avgImpactsPerSession = sessions.length > 0 ? (totalImpacts / sessions.length).toFixed(1) : '0';
-  const flaggedPercentage = totalImpacts > 0 ? ((totalFlagged / totalImpacts) * 100).toFixed(1) : '0';
+    return {
+      allImpacts: impacts,
+      totalImpacts: total,
+      totalFlagged: flagged,
+      avgG: total > 0 ? (impacts.reduce((sum, i) => sum + i.gForce, 0) / total).toFixed(1) : '0',
+      maxG: total > 0 ? Math.max(...impacts.map(i => i.gForce)).toFixed(1) : '0',
+      minG: total > 0 ? Math.min(...impacts.map(i => i.gForce)).toFixed(1) : '0',
+      avgImpactsPerSession: sessions.length > 0 ? (total / sessions.length).toFixed(1) : '0',
+      flaggedPercentage: total > 0 ? ((flagged / total) * 100).toFixed(1) : '0',
+    };
+  }, [sessions]);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>

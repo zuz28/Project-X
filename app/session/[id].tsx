@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, FlatList } from 'react-native';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useStore } from '../../store';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../styles/theme';
@@ -45,10 +45,18 @@ export default function SessionDetailScreen() {
     );
   }
 
-  const sortedImpacts = [...session.impacts].sort((a, b) => b.gForce - a.gForce);
-  const maxG = Math.max(...session.impacts.map((i: any) => i.gForce));
-  const avgG = (session.impacts.reduce((sum: number, i: any) => sum + i.gForce, 0) / session.impacts.length).toFixed(1);
-  const flaggedCount = session.impacts.filter((i: any) => i.flagged).length;
+  // Memoize expensive calculations
+  const { sortedImpacts, maxG, avgG, flaggedCount } = useMemo(() => {
+    const impacts = session.impacts || [];
+    const sorted = [...impacts].sort((a, b) => b.gForce - a.gForce);
+    const max = impacts.length > 0 ? Math.max(...impacts.map((i: any) => i.gForce)) : 0;
+    const avg = impacts.length > 0
+      ? (impacts.reduce((sum: number, i: any) => sum + i.gForce, 0) / impacts.length).toFixed(1)
+      : '0';
+    const flagged = impacts.filter((i: any) => i.flagged).length;
+
+    return { sortedImpacts: sorted, maxG: max, avgG: avg, flaggedCount: flagged };
+  }, [session.impacts]);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
@@ -17,20 +17,28 @@ export default function InsightsScreen() {
     }).start();
   }, []);
 
-  const allImpacts = sessions.flatMap(s => s.impacts);
-  const criticalImpacts = allImpacts.filter(i => i.gForce > 60);
-  const highImpacts = allImpacts.filter(i => i.gForce > 40 && i.gForce <= 60);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayImpacts = allImpacts.filter(i => new Date(i.timestamp) >= today);
+  // Memoize impact calculations
+  const { allImpacts, criticalImpacts, highImpacts, todayImpacts, recommendations } = useMemo(() => {
+    const impacts = sessions.flatMap(s => s.impacts);
+    const critical = impacts.filter(i => i.gForce > 60);
+    const high = impacts.filter(i => i.gForce > 40 && i.gForce <= 60);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const today_impacts = impacts.filter(i => new Date(i.timestamp) >= today);
 
-  // Generate recommendations
-  const recommendations = getRecommendations(
-    criticalImpacts.length,
-    highImpacts.length,
-    todayImpacts.length,
-    allImpacts.length
-  );
+    return {
+      allImpacts: impacts,
+      criticalImpacts: critical,
+      highImpacts: high,
+      todayImpacts: today_impacts,
+      recommendations: getRecommendations(
+        critical.length,
+        high.length,
+        today_impacts.length,
+        impacts.length
+      ),
+    };
+  }, [sessions]);
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
