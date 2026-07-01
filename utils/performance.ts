@@ -120,7 +120,7 @@ export function withPerformanceTracking<P extends object>(
       return () => {
         performanceMonitor.endMeasure(`render_${componentName}`);
       };
-    });
+    }, []);
 
     return <Component {...props} />;
   };

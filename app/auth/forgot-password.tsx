@@ -146,7 +146,7 @@ export default function ForgotPasswordScreen() {
               onPress={() => {
                 setStep('email');
                 setVerificationCode('');
-                setError('');
+                clearError();
               }}
               activeOpacity={0.7}
             >

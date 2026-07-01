@@ -30,7 +30,7 @@ export function useAuth(): UseAuthResult {
   // Restore session on app start
   useEffect(() => {
     restoreSession();
-  }, []);
+  }, [restoreSession]);
 
   const restoreSession = useCallback(async () => {
     try {

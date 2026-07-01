@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, TextInput } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../hooks/useAuth';
@@ -137,7 +137,7 @@ export default function LoginScreen() {
               onPress={() => {
                 setStep('email');
                 setVerificationCode('');
-                setError('');
+                clearError();
               }}
               activeOpacity={0.7}
             >

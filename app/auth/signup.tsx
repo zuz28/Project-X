@@ -174,7 +174,7 @@ export default function SignupScreen() {
               onPress={() => {
                 setStep('details');
                 setVerificationCode('');
-                setError('');
+                clearError();
               }}
               activeOpacity={0.7}
             >
