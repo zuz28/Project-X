@@ -13,6 +13,7 @@ export default function LoginScreen() {
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [verificationCode, setVerificationCode] = useState('');
   const [localError, setLocalError] = useState('');
+  const [demoCode, setDemoCode] = useState('');
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -25,7 +26,8 @@ export default function LoginScreen() {
   const handleSendCode = async () => {
     try {
       setLocalError('');
-      await sendVerificationCode(email, 'login');
+      const result = await sendVerificationCode(email, 'login');
+      setDemoCode(result.demoCode ?? '');
       setStep('code');
       logger.info('Verification code sent', { email }, 'LOGIN');
     } catch (err: any) {
@@ -104,6 +106,13 @@ export default function LoginScreen() {
               <Text style={styles.description}>
                 Check your email for the 6-digit code
               </Text>
+              {demoCode !== '' && (
+                <View style={styles.demoBanner}>
+                  <Text style={styles.demoBannerText}>
+                    📧 Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
+                  </Text>
+                </View>
+              )}
               <TextInput
                 style={styles.input}
                 placeholder="000000"
@@ -249,6 +258,19 @@ const styles = StyleSheet.create({
     color: Colors.accentRed,
     fontSize: Typography.size.sm,
     marginBottom: Spacing.md,
+  },
+  demoBanner: {
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: Radius.md,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  demoBannerText: {
+    fontSize: Typography.size.sm,
+    color: Colors.text,
+    lineHeight: 20,
   },
   footer: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -9,14 +9,18 @@ import { crashReportingService } from '../services/crashReporting';
 import { ImpactAlert } from '../components/ImpactAlert';
 import { ErrorBoundary } from '../utils/errorBoundary';
 import { logger } from '../utils/logger';
+import { loadPersistedSession } from '../hooks/useAuth';
 
 export default function RootLayout() {
-  const { isAuthenticated, setSessions, addImpact, currentSession, setUser } = useStore();
+  const router = useRouter();
+  const segments = useSegments();
+  const { isAuthenticated, setUser, setSessions, addImpact, currentSession } = useStore();
   const [lastImpact, setLastImpact] = useState<any>(null);
   const [showAlert, setShowAlert] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
+  // One-time startup: crash reporting + restore persisted login session
   useEffect(() => {
-    // Initialize crash reporting (requires Sentry DSN in environment)
     const sentryDSN = process.env.EXPO_PUBLIC_SENTRY_DSN;
     if (sentryDSN) {
       crashReportingService.initialize(sentryDSN);
@@ -24,25 +28,38 @@ export default function RootLayout() {
       logger.warn('Sentry DSN not configured - crash reporting disabled', {}, 'APP');
     }
 
-    // Auto-authenticate for development/demo purposes
-    if (!isAuthenticated) {
-      setUser({
-        id: 'user-demo',
-        email: 'demo@vela.app',
-        name: 'Demo User',
-      });
-      logger.info('Demo user authenticated', {}, 'APP');
-    }
+    loadPersistedSession()
+      .then((savedUser) => {
+        if (savedUser) {
+          setUser(savedUser);
+          logger.info('Session restored', { userId: savedUser.id }, 'APP');
+        }
+      })
+      .finally(() => setAuthChecked(true));
+  }, []);
 
-    if (isAuthenticated) {
-      loadSessions();
-      const unsubscribe = setupBLEListener();
-      logger.info('App authenticated', {}, 'APP');
+  // Route guard: unauthenticated users go to login, authenticated users
+  // are kept out of the auth screens.
+  useEffect(() => {
+    if (!authChecked) return;
 
-      // Cleanup listener on unmount or auth change
-      return unsubscribe;
+    const inAuthGroup = segments[0] === 'auth';
+    if (!isAuthenticated && !inAuthGroup) {
+      router.replace('/auth/login');
+    } else if (isAuthenticated && inAuthGroup) {
+      router.replace('/(tabs)');
     }
-  }, [isAuthenticated, setUser]);
+  }, [authChecked, isAuthenticated, segments]);
+
+  // Load sessions and listen for BLE impacts while logged in
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    loadSessions();
+    const unsubscribe = setupBLEListener();
+    logger.info('App authenticated', {}, 'APP');
+    return unsubscribe;
+  }, [isAuthenticated]);
 
   const loadSessions = async () => {
     try {

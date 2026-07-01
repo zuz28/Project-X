@@ -1,7 +1,7 @@
 // Crash reporting and error tracking service
 // Integrates with Sentry for production error monitoring
 
-import { logger } from '../utils/logger';
+import { logger, LogLevel } from '../utils/logger';
 
 export interface CrashReportConfig {
   dsn?: string;
@@ -57,7 +57,7 @@ class CrashReportingService {
 
   captureMessage(message: string, level: 'info' | 'warning' | 'error' = 'info', context?: any): void {
     if (!this.config.enabled || !this.isInitialized) {
-      logger.log(level === 'error' ? 'ERROR' : 'INFO', message, context, 'CRASH');
+      logger.log(level === 'error' ? LogLevel.ERROR : LogLevel.INFO, message, context, 'CRASH');
       return;
     }
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Switch, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
@@ -6,6 +6,8 @@ import { useStore } from '../store';
 import { bleService } from '../services/ble';
 import { exportSessionsAsCSV, generateReport } from '../services/export';
 import { logger } from '../utils/logger';
+import { showConfirm, showNotice } from '../utils/dialog';
+import { AUTH_SESSION_KEY } from '../hooks/useAuth';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
 
 const SETTINGS_KEY = '@vela_settings';
@@ -19,27 +21,16 @@ export default function SettingsScreen() {
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Sign Out',
-          onPress: async () => {
-            if (isConnected) {
-              await bleService.disconnectDevice();
-            }
-            logout();
-            router.replace('/auth/login');
-          },
-          style: 'destructive',
-        },
-      ]
-    );
+    showConfirm('Sign Out', 'Are you sure you want to sign out?', async () => {
+      if (isConnected) {
+        await bleService.disconnectDevice();
+      }
+      // Clear the persisted session so the user is not silently logged
+      // back in on next launch.
+      await AsyncStorage.removeItem(AUTH_SESSION_KEY);
+      logout();
+      router.replace('/auth/login');
+    }, 'Sign Out');
   };
 
   useEffect(() => {
@@ -90,25 +81,10 @@ export default function SettingsScreen() {
   };
 
   const handleClearData = () => {
-    Alert.alert(
-      'Clear All Data',
-      'This action cannot be undone. Are you sure?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => {},
-          style: 'cancel',
-        },
-        {
-          text: 'Clear',
-          onPress: () => {
-            clearAll();
-            Alert.alert('Success', 'All data has been cleared');
-          },
-          style: 'destructive',
-        },
-      ]
-    );
+    showConfirm('Clear All Data', 'This action cannot be undone. Are you sure?', () => {
+      clearAll();
+      showNotice('Success', 'All data has been cleared');
+    }, 'Clear');
   };
 
   const handleExportData = () => {
@@ -116,18 +92,13 @@ export default function SettingsScreen() {
       const csv = exportSessionsAsCSV(sessions);
       const report = generateReport(sessions);
 
-      Alert.alert(
+      showNotice(
         'Export Generated',
-        'Your data has been exported. You can now share or save it.\n\nCSV file is ready to copy.',
-        [
-          {
-            text: 'OK',
-            onPress: () => logger.info('Data exported successfully', {}, 'SETTINGS'),
-          },
-        ]
+        'Your data has been exported. You can now share or save it.\n\nCSV file is ready to copy.'
       );
+      logger.info('Data exported successfully', {}, 'SETTINGS');
     } catch (error) {
-      Alert.alert('Error', 'Failed to export data');
+      showNotice('Error', 'Failed to export data');
     }
   };
 

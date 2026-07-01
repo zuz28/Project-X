@@ -184,7 +184,7 @@ class CloudSyncService {
     return this.syncInProgress;
   }
 
-  isInitialized(): boolean {
+  getInitializationStatus(): boolean {
     return this.isInitialized;
   }
 

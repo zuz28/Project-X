@@ -15,6 +15,7 @@ export default function ForgotPasswordScreen() {
   const [verificationCode, setVerificationCode] = useState('');
   const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
   const [localError, setLocalError] = useState('');
+  const [demoCode, setDemoCode] = useState('');
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -27,7 +28,8 @@ export default function ForgotPasswordScreen() {
   const handleSendCode = async () => {
     try {
       setLocalError('');
-      await sendVerificationCode(email, 'reset');
+      const result = await sendVerificationCode(email, 'reset');
+      setDemoCode(result.demoCode ?? '');
       setStep('code');
       logger.info('Reset code sent', { email }, 'FORGOT_PASSWORD');
     } catch (err: any) {
@@ -115,6 +117,13 @@ export default function ForgotPasswordScreen() {
               <Text style={styles.description}>
                 Check your email for the 6-digit code
               </Text>
+              {demoCode !== '' && (
+                <View style={styles.demoBanner}>
+                  <Text style={styles.demoBannerText}>
+                    📧 Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
+                  </Text>
+                </View>
+              )}
               <TextInput
                 style={styles.input}
                 placeholder="000000"
@@ -292,5 +301,18 @@ const styles = StyleSheet.create({
     color: Colors.accentRed,
     fontSize: Typography.size.sm,
     marginBottom: Spacing.md,
+  },
+  demoBanner: {
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: Radius.md,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  demoBannerText: {
+    fontSize: Typography.size.sm,
+    color: Colors.text,
+    lineHeight: 20,
   },
 });

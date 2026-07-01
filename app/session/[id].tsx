@@ -166,7 +166,7 @@ function SummaryCard({ label, value, color }: { label: string; value: string; co
   return (
     <View style={styles.summaryCard}>
       <Text style={styles.summaryLabel}>{label}</Text>
-      <Text style={[styles.summaryValue, color && { color }]}>
+      <Text style={[styles.summaryValue, color ? { color } : null]}>
         {value}
       </Text>
     </View>

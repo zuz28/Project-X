@@ -66,7 +66,7 @@ export default function AlertsScreen() {
               activeOpacity={0.7}
             >
               <View style={styles.alertIcon}>
-                <Text>⚠️</Text>
+                <Text style={styles.alertIconText}>⚠️</Text>
               </View>
               <View style={styles.alertInfo}>
                 <Text style={styles.alertG}>{impact.gForce}G Impact</Text>
@@ -141,6 +141,10 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
   },
   alertIcon: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  alertIconText: {
     fontSize: 24,
   },
   alertInfo: {

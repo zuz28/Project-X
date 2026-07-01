@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, ActivityIndicator, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, ActivityIndicator, TextInput } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { bleService, BluetoothDevice } from '../services/ble';
 import { helmetService } from '../services/helmet';
 import { logger } from '../utils/logger';
+import { showNotice } from '../utils/dialog';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styles/theme';
 
 export default function ConnectScreen() {
@@ -50,25 +51,25 @@ export default function ConnectScreen() {
 
   const handleConfirmPairing = async () => {
     if (!helmetName.trim() || !helmetSerial.trim()) {
-      Alert.alert('Missing Information', 'Please enter helmet name and serial number');
+      showNotice('Missing Information', 'Please enter helmet name and serial number');
       return;
     }
 
     // Validate helmet name length
     if (helmetName.trim().length < 2 || helmetName.trim().length > 50) {
-      Alert.alert('Invalid Name', 'Helmet name must be between 2 and 50 characters');
+      showNotice('Invalid Name', 'Helmet name must be between 2 and 50 characters');
       return;
     }
 
     // Validate serial number length
     if (helmetSerial.trim().length < 3 || helmetSerial.trim().length > 50) {
-      Alert.alert('Invalid Serial', 'Serial number must be between 3 and 50 characters');
+      showNotice('Invalid Serial', 'Serial number must be between 3 and 50 characters');
       return;
     }
 
     // Validate serial number format (alphanumeric and hyphens only)
     if (!/^[a-zA-Z0-9\-]+$/.test(helmetSerial.trim())) {
-      Alert.alert('Invalid Serial', 'Serial number can only contain letters, numbers, and hyphens');
+      showNotice('Invalid Serial', 'Serial number can only contain letters, numbers, and hyphens');
       return;
     }
 
@@ -98,25 +99,14 @@ export default function ConnectScreen() {
 
       // Success feedback
       await new Promise(resolve => setTimeout(resolve, 500));
-      Alert.alert(
+      showNotice(
         'Helmet Paired',
-        `${helmetName} is now connected and ready to track impacts.`,
-        [
-          {
-            text: 'View Helmet Info',
-            onPress: () => {
-              router.push('/helmet');
-            },
-          },
-          {
-            text: 'Continue',
-            onPress: () => router.back(),
-          },
-        ]
+        `${helmetName} is now connected and ready to track impacts.`
       );
+      router.back();
     } catch (error) {
       logger.error('Helmet connection failed', error, 'CONNECT');
-      Alert.alert('Connection Failed', 'Unable to pair helmet. Please try again.');
+      showNotice('Connection Failed', 'Unable to pair helmet. Please try again.');
       setConnectingTo(null);
     }
   };
@@ -205,7 +195,7 @@ export default function ConnectScreen() {
                     <ActivityIndicator color={Colors.primary} size="small" />
                   ) : (
                     <View style={styles.connectArrow}>
-                      <Text>→</Text>
+                      <Text style={styles.connectArrowText}>→</Text>
                     </View>
                   )}
                 </TouchableOpacity>
@@ -450,6 +440,10 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   connectArrow: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  connectArrowText: {
     fontSize: Typography.size.lg,
     color: Colors.primary,
   },

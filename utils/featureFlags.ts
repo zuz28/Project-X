@@ -54,7 +54,7 @@ class FeatureFlagService {
   }
 
   setFlags(flags: Partial<FeatureFlagConfig>) {
-    this.flags = { ...this.flags, ...flags };
+    this.flags = { ...this.flags, ...flags } as FeatureFlagConfig;
     logger.debug('Feature flags updated', flags, 'FEATURES');
     this.notifyListeners();
   }

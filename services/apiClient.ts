@@ -149,7 +149,7 @@ class ApiClient {
 
       return {
         success: true,
-        data: body,
+        data: body ?? undefined,
         status: response.status,
       };
     } catch (error: any) {

@@ -145,7 +145,7 @@ class PushNotificationService {
     return this.permissions;
   }
 
-  isInitialized(): boolean {
+  getInitializationStatus(): boolean {
     return this.isInitialized;
   }
 }

@@ -16,6 +16,7 @@ export default function SignupScreen() {
   const [step, setStep] = useState<'details' | 'verify'>('details');
   const [verificationCode, setVerificationCode] = useState('');
   const [localError, setLocalError] = useState('');
+  const [demoCode, setDemoCode] = useState('');
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -28,7 +29,8 @@ export default function SignupScreen() {
   const handleSendCode = async () => {
     try {
       setLocalError('');
-      await sendVerificationCode(email, 'signup');
+      const result = await sendVerificationCode(email, 'signup');
+      setDemoCode(result.demoCode ?? '');
       setStep('verify');
       logger.info('Signup code sent', { email }, 'SIGNUP');
     } catch (err: any) {
@@ -141,6 +143,13 @@ export default function SignupScreen() {
               <Text style={styles.description}>
                 We sent a 6-digit code to {email}
               </Text>
+              {demoCode !== '' && (
+                <View style={styles.demoBanner}>
+                  <Text style={styles.demoBannerText}>
+                    📧 Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
+                  </Text>
+                </View>
+              )}
               <TextInput
                 style={styles.input}
                 placeholder="000000"
@@ -284,6 +293,19 @@ const styles = StyleSheet.create({
     color: Colors.accentRed,
     fontSize: Typography.size.sm,
     marginBottom: Spacing.md,
+  },
+  demoBanner: {
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: Radius.md,
+    borderLeftWidth: 4,
+    borderLeftColor: Colors.primary,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  demoBannerText: {
+    fontSize: Typography.size.sm,
+    color: Colors.text,
+    lineHeight: 20,
   },
   footer: {
     flexDirection: 'row',
