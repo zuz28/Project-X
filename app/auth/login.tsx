@@ -1,19 +1,18 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, TextInput, Alert } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useStore } from '../../store';
-import { authService } from '../../services/auth';
+import { useAuth } from '../../hooks/useAuth';
 import { Colors, Spacing, Radius, Typography, Animation } from '../../styles/theme';
+import { logger } from '../../utils/logger';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { setUser } = useStore();
+  const { login, sendVerificationCode, error, isLoading, clearError } = useAuth();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [email, setEmail] = useState('');
   const [step, setStep] = useState<'email' | 'code'>('email');
   const [verificationCode, setVerificationCode] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -24,44 +23,26 @@ export default function LoginScreen() {
   }, []);
 
   const handleSendCode = async () => {
-    if (!email.trim()) {
-      setError('Please enter your email');
-      return;
-    }
-
-    if (!authService.emailExists(email)) {
-      setError('No account found with this email');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
     try {
-      await authService.sendVerificationEmail(email, 'login');
+      setLocalError('');
+      await sendVerificationCode(email, 'login');
       setStep('code');
-    } catch (err) {
-      setError('Failed to send verification code');
-    } finally {
-      setIsLoading(false);
+      logger.info('Verification code sent', { email }, 'LOGIN');
+    } catch (err: any) {
+      setLocalError(err.message || 'Failed to send verification code');
+      logger.error('Send code failed', err, 'LOGIN');
     }
   };
 
   const handleVerifyCode = async () => {
-    if (!verificationCode.trim()) {
-      setError('Please enter the verification code');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
     try {
-      const user = await authService.verifyAndLogin(email, verificationCode);
-      setUser(user);
+      setLocalError('');
+      await login(email, verificationCode);
+      logger.info('Login successful', { email }, 'LOGIN');
       router.replace('/(tabs)');
     } catch (err: any) {
-      setError(err.message || 'Verification failed');
-    } finally {
-      setIsLoading(false);
+      setLocalError(err.message || 'Verification failed');
+      logger.error('Login verification failed', err, 'LOGIN');
     }
   };
 
@@ -93,13 +74,14 @@ export default function LoginScreen() {
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
-                  setError('');
+                  setLocalError('');
+                  clearError();
                 }}
                 editable={!isLoading}
               />
             </View>
 
-            {error && <Text style={styles.error}>{error}</Text>}
+            {(error || localError) && <Text style={styles.error}>{error || localError}</Text>}
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
@@ -131,13 +113,14 @@ export default function LoginScreen() {
                 value={verificationCode}
                 onChangeText={(text) => {
                   setVerificationCode(text.replace(/[^0-9]/g, ''));
-                  setError('');
+                  setLocalError('');
+                  clearError();
                 }}
                 editable={!isLoading}
               />
             </View>
 
-            {error && <Text style={styles.error}>{error}</Text>}
+            {(error || localError) && <Text style={styles.error}>{error || localError}</Text>}
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}

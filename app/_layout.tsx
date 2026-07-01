@@ -6,6 +6,9 @@ import { useStore } from '../store';
 import { getSessions } from '../services/storage';
 import { bleService } from '../services/ble';
 import { ImpactAlert } from '../components/ImpactAlert';
+import { NetworkStatusBar } from '../components/NetworkStatusBar';
+import { ErrorBoundary } from '../utils/errorBoundary';
+import { logger } from '../utils/logger';
 
 export default function RootLayout() {
   const { isAuthenticated, setSessions, addImpact, currentSession } = useStore();
@@ -49,42 +52,49 @@ export default function RootLayout() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animationEnabled: true,
-          animationTypeForReplace: 'fade',
-        }}
-      >
-        {!isAuthenticated ? (
-          // Auth Stack
-          <Stack.Group>
-            <Stack.Screen name="auth/login" />
-            <Stack.Screen name="auth/signup" options={{ animationTypeForReplace: 'fade' }} />
-            <Stack.Screen name="auth/forgot-password" options={{ animationTypeForReplace: 'fade' }} />
-          </Stack.Group>
-        ) : (
-          // App Stack
-          <Stack.Group>
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="impact/[id]" options={{ animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="connect" options={{ animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="settings" options={{ animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="helmet" options={{ animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="session/[id]" options={{ animation: 'slide_from_bottom' }} />
-            <Stack.Screen name="insights" options={{ animation: 'slide_from_bottom' }} />
-          </Stack.Group>
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        logger.error('Error Boundary caught', error, 'ROOT_LAYOUT');
+      }}
+    >
+      <View style={{ flex: 1 }}>
+        <NetworkStatusBar />
+        <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animationEnabled: true,
+            animationTypeForReplace: 'fade',
+          }}
+        >
+          {!isAuthenticated ? (
+            // Auth Stack
+            <Stack.Group>
+              <Stack.Screen name="auth/login" />
+              <Stack.Screen name="auth/signup" options={{ animationTypeForReplace: 'fade' }} />
+              <Stack.Screen name="auth/forgot-password" options={{ animationTypeForReplace: 'fade' }} />
+            </Stack.Group>
+          ) : (
+            // App Stack
+            <Stack.Group>
+              <Stack.Screen name="(tabs)" />
+              <Stack.Screen name="impact/[id]" options={{ animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="connect" options={{ animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="settings" options={{ animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="helmet" options={{ animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="session/[id]" options={{ animation: 'slide_from_bottom' }} />
+              <Stack.Screen name="insights" options={{ animation: 'slide_from_bottom' }} />
+            </Stack.Group>
+          )}
+        </Stack>
+        {lastImpact && isAuthenticated && (
+          <ImpactAlert
+            gForce={lastImpact.gForce}
+            timestamp={lastImpact.timestamp}
+            visible={showAlert}
+          />
         )}
-      </Stack>
-      {lastImpact && isAuthenticated && (
-        <ImpactAlert
-          gForce={lastImpact.gForce}
-          timestamp={lastImpact.timestamp}
-          visible={showAlert}
-        />
-      )}
-    </View>
+      </View>
+    </ErrorBoundary>
   );
 }

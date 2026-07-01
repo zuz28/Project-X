@@ -1,19 +1,20 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, TextInput } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { authService } from '../../services/auth';
+import { useAuth } from '../../hooks/useAuth';
 import { Colors, Spacing, Radius, Typography, Animation } from '../../styles/theme';
+import { logger } from '../../utils/logger';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const { resetPassword, sendVerificationCode, error, isLoading, clearError } = useAuth();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -24,56 +25,35 @@ export default function ForgotPasswordScreen() {
   }, []);
 
   const handleSendCode = async () => {
-    if (!email.trim()) {
-      setError('Please enter your email');
-      return;
-    }
-
-    if (!authService.emailExists(email)) {
-      setError('No account found with this email');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
     try {
-      await authService.sendVerificationEmail(email, 'reset');
+      setLocalError('');
+      await sendVerificationCode(email, 'reset');
       setStep('code');
-    } catch (err) {
-      setError('Failed to send verification code');
-    } finally {
-      setIsLoading(false);
+      logger.info('Reset code sent', { email }, 'FORGOT_PASSWORD');
+    } catch (err: any) {
+      setLocalError(err.message || 'Failed to send verification code');
+      logger.error('Send reset code failed', err, 'FORGOT_PASSWORD');
     }
   };
 
   const handleVerifyCode = () => {
     if (!verificationCode.trim()) {
-      setError('Please enter the verification code');
+      setLocalError('Please enter the verification code');
       return;
     }
+    setLocalError('');
     setStep('password');
   };
 
   const handleResetPassword = async () => {
-    if (!newPassword.trim()) {
-      setError('Please enter a new password');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
     try {
-      await authService.verifyAndResetPassword(email, verificationCode, newPassword);
+      setLocalError('');
+      await resetPassword(email, verificationCode, newPassword);
+      logger.info('Password reset successful', { email }, 'FORGOT_PASSWORD');
       router.replace('/auth/login');
     } catch (err: any) {
-      setError(err.message || 'Password reset failed');
-    } finally {
-      setIsLoading(false);
+      setLocalError(err.message || 'Password reset failed');
+      logger.error('Password reset failed', err, 'FORGOT_PASSWORD');
     }
   };
 
@@ -105,13 +85,14 @@ export default function ForgotPasswordScreen() {
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
-                  setError('');
+                  setLocalError('');
+                  clearError();
                 }}
                 editable={!isLoading}
               />
             </View>
 
-            {error && <Text style={styles.error}>{error}</Text>}
+            {(error || localError) && <Text style={styles.error}>{error || localError}</Text>}
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
@@ -143,13 +124,14 @@ export default function ForgotPasswordScreen() {
                 value={verificationCode}
                 onChangeText={(text) => {
                   setVerificationCode(text.replace(/[^0-9]/g, ''));
-                  setError('');
+                  setLocalError('');
+                  clearError();
                 }}
                 editable={!isLoading}
               />
             </View>
 
-            {error && <Text style={styles.error}>{error}</Text>}
+            {(error || localError) && <Text style={styles.error}>{error || localError}</Text>}
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
@@ -186,14 +168,15 @@ export default function ForgotPasswordScreen() {
                 value={newPassword}
                 onChangeText={(text) => {
                   setNewPassword(text);
-                  setError('');
+                  setLocalError('');
+                  clearError();
                 }}
                 editable={!isLoading}
               />
               <Text style={styles.hint}>At least 6 characters</Text>
             </View>
 
-            {error && <Text style={styles.error}>{error}</Text>}
+            {(error || localError) && <Text style={styles.error}>{error || localError}</Text>}
 
             <TouchableOpacity
               style={[styles.button, isLoading && styles.buttonDisabled]}
