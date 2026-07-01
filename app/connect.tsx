@@ -210,6 +210,10 @@ export default function ConnectScreen() {
               onPress={() => {
                 setShowNamingForm(false);
                 setSelectedDevice(null);
+                setHelmetName('');
+                setHelmetModel('Vela Pro');
+                setHelmetSerial('');
+                setConnectingTo(null);
               }}
               activeOpacity={0.7}
             >
@@ -270,9 +274,9 @@ export default function ConnectScreen() {
             </View>
 
             <TouchableOpacity
-              style={[styles.pairButton, connectingTo && styles.pairButtonDisabled]}
+              style={[styles.pairButton, (connectingTo !== null || !helmetName.trim() || !helmetSerial.trim()) && styles.pairButtonDisabled]}
               onPress={handleConfirmPairing}
-              disabled={connectingTo !== null}
+              disabled={connectingTo !== null || !helmetName.trim() || !helmetSerial.trim()}
               activeOpacity={0.7}
             >
               <Text style={styles.pairButtonText}>
