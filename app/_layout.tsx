@@ -12,7 +12,7 @@ import { ErrorBoundary } from '../utils/errorBoundary';
 import { logger } from '../utils/logger';
 
 export default function RootLayout() {
-  const { isAuthenticated, setSessions, addImpact, currentSession } = useStore();
+  const { isAuthenticated, setSessions, addImpact, currentSession, setUser } = useStore();
   const [lastImpact, setLastImpact] = useState<any>(null);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -25,6 +25,16 @@ export default function RootLayout() {
       logger.warn('Sentry DSN not configured - crash reporting disabled', {}, 'APP');
     }
 
+    // Auto-authenticate for development/demo purposes
+    if (!isAuthenticated) {
+      setUser({
+        id: 'user-demo',
+        email: 'demo@vela.app',
+        name: 'Demo User',
+      });
+      logger.info('Demo user authenticated', {}, 'APP');
+    }
+
     if (isAuthenticated) {
       loadSessions();
       const unsubscribe = setupBLEListener();
@@ -33,7 +43,7 @@ export default function RootLayout() {
       // Cleanup listener on unmount or auth change
       return unsubscribe;
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setUser]);
 
   const loadSessions = async () => {
     try {
