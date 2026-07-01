@@ -8,7 +8,7 @@ import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styl
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isConnected, connectedDeviceName, setConnected, setConnectedDeviceName, clearAll, sessions, user, logout } = useStore();
+  const { isConnected, connectedDeviceName, setConnected, setConnectedDeviceName, setConnectedHelmetId, clearAll, sessions, user, logout } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [impactThreshold, setImpactThreshold] = useState(40);
@@ -25,7 +25,10 @@ export default function SettingsScreen() {
         },
         {
           text: 'Sign Out',
-          onPress: () => {
+          onPress: async () => {
+            if (isConnected) {
+              await bleService.disconnectDevice();
+            }
             logout();
             router.replace('/auth/login');
           },
@@ -49,6 +52,7 @@ export default function SettingsScreen() {
       await bleService.disconnectDevice();
       setConnected(false);
       setConnectedDeviceName(null);
+      setConnectedHelmetId(null);
     } finally {
       setIsDisconnecting(false);
     }
