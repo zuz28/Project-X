@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Vela",
-    "slug": "vela-app",
+    "slug": "vela",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,35 +10,17 @@
     "platforms": ["ios", "android", "web"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.vela.app",
-      "infoPlist": {
-        "NSBluetoothPeripheralUsageDescription": "This app needs Bluetooth to connect to your helmet",
-        "NSBluetoothAlwaysUsageDescription": "This app needs Bluetooth to track your impacts"
-      }
+      "bundleIdentifier": "com.vela.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.vela.app",
-      "permissions": [
-        "android.permission.BLUETOOTH",
-        "android.permission.BLUETOOTH_ADMIN",
-        "android.permission.BLUETOOTH_SCAN",
-        "android.permission.BLUETOOTH_CONNECT"
-      ]
+      "package": "com.vela.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "react-native-ble-plx",
-        {
-          "isBackgroundEnabled": true
-        }
-      ]
-    ]
+    }
   }
 }
