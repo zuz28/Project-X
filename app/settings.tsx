@@ -8,11 +8,32 @@ import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../styl
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { isConnected, connectedDeviceName, setConnected, setConnectedDeviceName, clearAll, sessions } = useStore();
+  const { isConnected, connectedDeviceName, setConnected, setConnectedDeviceName, clearAll, sessions, user, logout } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [impactThreshold, setImpactThreshold] = useState(40);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Sign Out',
+          onPress: () => {
+            logout();
+            router.replace('/auth/login');
+          },
+          style: 'destructive',
+        },
+      ]
+    );
+  };
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -94,6 +115,24 @@ export default function SettingsScreen() {
             <Text style={styles.headerTitle}>Settings</Text>
           </View>
         </View>
+
+        {/* User Profile Section */}
+        {user && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Account</Text>
+            <View style={styles.profileBox}>
+              <View style={styles.profileIcon}>
+                <Text style={styles.profileIconText}>
+                  {user.name.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>{user.name}</Text>
+                <Text style={styles.profileEmail}>{user.email}</Text>
+              </View>
+            </View>
+          </View>
+        )}
 
         {/* Device Section */}
         <View style={styles.section}>
@@ -201,6 +240,21 @@ export default function SettingsScreen() {
               </View>
               <Text style={styles.settingArrow}>→</Text>
             </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Danger Zone */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, styles.dangerTitle]}>Account</Text>
+          <View style={[styles.sectionBox, styles.dangerBox]}>
+            <TouchableOpacity
+              style={styles.dangerButton}
+              onPress={handleLogout}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.dangerButtonText}>Sign Out</Text>
+            </TouchableOpacity>
+            <Text style={styles.dangerDescription}>You will be returned to the login screen</Text>
           </View>
         </View>
 
@@ -454,5 +508,40 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.base,
     color: Colors.text,
     fontWeight: '600',
+  },
+  profileBox: {
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: Radius.lg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+  },
+  profileIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileIconText: {
+    fontSize: Typography.size['2xl'],
+    fontWeight: '700',
+    color: Colors.background,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: Typography.size.base,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: Spacing.xs,
+  },
+  profileEmail: {
+    fontSize: Typography.size.sm,
+    color: Colors.textTertiary,
   },
 });
