@@ -8,7 +8,7 @@ import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../s
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { currentSession, setCurrentSession, addImpact } = useStore();
+  const { currentSession, setCurrentSession, isConnected, connectedDeviceName } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -32,6 +32,10 @@ export default function HomeScreen() {
     await addSession(session);
   };
 
+  const handleConnectPress = () => {
+    router.push('/connect');
+  };
+
   if (!currentSession) {
     return (
       <View style={[styles.container, styles.center]}>
@@ -53,8 +57,22 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Vela</Text>
-          <Text style={styles.headerSubtitle}>Session Tracking</Text>
+          <View style={styles.headerTop}>
+            <View>
+              <Text style={styles.headerTitle}>Vela</Text>
+              <Text style={styles.headerSubtitle}>Session Tracking</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => router.push('/settings')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.settingsIcon}>⚙️</Text>
+            </TouchableOpacity>
+          </View>
+          {isConnected && connectedDeviceName && (
+            <Text style={styles.deviceName}>{connectedDeviceName}</Text>
+          )}
         </View>
 
         {/* Main Stats Cards */}
@@ -67,8 +85,17 @@ export default function HomeScreen() {
 
         {/* Action Buttons */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.7}>
-            <Text style={styles.primaryButtonText}>Connect Helmet</Text>
+          <TouchableOpacity
+            style={[styles.primaryButton, isConnected && styles.primaryButtonConnected]}
+            onPress={handleConnectPress}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.primaryButtonIcon}>
+              {isConnected ? '✓' : '🔗'}
+            </Text>
+            <Text style={styles.primaryButtonText}>
+              {isConnected ? 'Helmet Connected' : 'Connect Helmet'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryButton}
@@ -135,6 +162,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     marginBottom: Spacing['2xl'],
   },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.sm,
+  },
   headerTitle: {
     fontSize: Typography.size['5xl'],
     fontWeight: '700',
@@ -145,6 +178,35 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.base,
     color: Colors.textTertiary,
     fontWeight: '500',
+  },
+  connectionBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundSecondary,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    gap: Spacing.xs,
+  },
+  connectionDot: {
+    fontSize: 8,
+    color: Colors.accentGreen,
+  },
+  connectionText: {
+    fontSize: Typography.size.xs,
+    color: Colors.text,
+    fontWeight: '600',
+  },
+  deviceName: {
+    fontSize: Typography.size.sm,
+    color: Colors.textTertiary,
+    fontWeight: '500',
+  },
+  settingsButton: {
+    padding: Spacing.sm,
+  },
+  settingsIcon: {
+    fontSize: Typography.size.xl,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -184,7 +246,18 @@ const styles = StyleSheet.create({
     borderRadius: Radius.lg,
     paddingVertical: Spacing.lg,
     alignItems: 'center',
+    justifyContent: 'center',
     ...Shadows.md,
+    flexDirection: 'row',
+    gap: Spacing.md,
+  },
+  primaryButtonConnected: {
+    backgroundColor: Colors.accentGreen,
+  },
+  primaryButtonIcon: {
+    fontSize: Typography.size.base,
+    color: Colors.background,
+    fontWeight: '600',
   },
   primaryButtonText: {
     color: Colors.background,

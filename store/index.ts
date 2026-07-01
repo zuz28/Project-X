@@ -19,12 +19,15 @@ interface AppState {
   currentSession: Session | null;
   isConnected: boolean;
   isScanning: boolean;
+  connectedDeviceName: string | null;
+  lastImpactTime: number | null;
 
   setSessions: (sessions: Session[]) => void;
   addSession: (session: Session) => void;
   setCurrentSession: (session: Session | null) => void;
   setConnected: (connected: boolean) => void;
   setScanning: (scanning: boolean) => void;
+  setConnectedDeviceName: (name: string | null) => void;
   addImpact: (impact: Impact) => void;
   clearAll: () => void;
 }
@@ -34,6 +37,8 @@ export const useStore = create<AppState>((set) => ({
   currentSession: null,
   isConnected: false,
   isScanning: false,
+  connectedDeviceName: null,
+  lastImpactTime: null,
 
   setSessions: (sessions) => set({ sessions }),
   addSession: (session) =>
@@ -44,6 +49,7 @@ export const useStore = create<AppState>((set) => ({
   setCurrentSession: (session) => set({ currentSession: session }),
   setConnected: (connected) => set({ isConnected: connected }),
   setScanning: (scanning) => set({ isScanning: scanning }),
+  setConnectedDeviceName: (name) => set({ connectedDeviceName: name }),
   addImpact: (impact) =>
     set((state) => {
       if (!state.currentSession) return state;
@@ -52,6 +58,7 @@ export const useStore = create<AppState>((set) => ({
           ...state.currentSession,
           impacts: [impact, ...state.currentSession.impacts],
         },
+        lastImpactTime: impact.timestamp,
       };
     }),
   clearAll: () => set({
@@ -59,5 +66,7 @@ export const useStore = create<AppState>((set) => ({
     currentSession: null,
     isConnected: false,
     isScanning: false,
+    connectedDeviceName: null,
+    lastImpactTime: null,
   }),
 }));
