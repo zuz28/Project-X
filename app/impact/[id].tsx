@@ -53,7 +53,7 @@ export default function ImpactDetailScreen() {
   }
 
   const severity = impact.gForce > 60 ? 'Critical' : impact.gForce > 40 ? 'High' : 'Normal';
-  const severityColor = impact.gForce > 60 ? Colors.accentRed : impact.gForce > 40 ? '#FF9500' : Colors.primary;
+  const severityColor = impact.gForce > 60 ? Colors.accentRed : impact.gForce > 40 ? Colors.accentOrange : Colors.primary;
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>

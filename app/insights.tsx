@@ -92,7 +92,7 @@ export default function InsightsScreen() {
             <RiskCard
               label="High Impacts"
               value={highImpacts.length.toString()}
-              color="#FF9500"
+              color={Colors.accentOrange}
               icon="⚠️"
             />
             <RiskCard
@@ -186,7 +186,7 @@ function RecommendationCard({
 }) {
   const colors = {
     critical: Colors.accentRed,
-    high: '#FF9500',
+    high: Colors.accentOrange,
     medium: Colors.primary,
   };
 

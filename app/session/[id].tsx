@@ -178,8 +178,8 @@ function getRiskLevel(maxG: number): string {
 
 function getRiskColor(maxG: number): string {
   if (maxG > 60) return Colors.accentRed;
-  if (maxG > 40) return '#FF9500';
-  if (maxG > 25) return '#FFB847';
+  if (maxG > 40) return Colors.accentOrange;
+  if (maxG > 25) return Colors.accentOrange;
   return Colors.accentGreen;
 }
 

@@ -97,7 +97,7 @@ export default function HelmetScreen() {
           const healthColors = {
             excellent: Colors.accentGreen,
             good: Colors.primary,
-            fair: '#FF9500',
+            fair: Colors.accentOrange,
             poor: Colors.accentRed,
           };
 
