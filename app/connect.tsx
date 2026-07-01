@@ -54,6 +54,24 @@ export default function ConnectScreen() {
       return;
     }
 
+    // Validate helmet name length
+    if (helmetName.trim().length < 2 || helmetName.trim().length > 50) {
+      Alert.alert('Invalid Name', 'Helmet name must be between 2 and 50 characters');
+      return;
+    }
+
+    // Validate serial number length
+    if (helmetSerial.trim().length < 3 || helmetSerial.trim().length > 50) {
+      Alert.alert('Invalid Serial', 'Serial number must be between 3 and 50 characters');
+      return;
+    }
+
+    // Validate serial number format (alphanumeric and hyphens only)
+    if (!/^[a-zA-Z0-9\-]+$/.test(helmetSerial.trim())) {
+      Alert.alert('Invalid Serial', 'Serial number can only contain letters, numbers, and hyphens');
+      return;
+    }
+
     if (!selectedDevice) return;
 
     setConnectingTo(selectedDevice.id);

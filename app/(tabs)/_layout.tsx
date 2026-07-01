@@ -2,19 +2,26 @@ import { Tabs } from 'expo-router';
 import { StyleSheet, View, Text } from 'react-native';
 import { Animated, Easing } from 'react-native';
 import { Colors, Spacing, Typography } from '../../styles/theme';
+import { ErrorBoundary } from '../../utils/errorBoundary';
+import { logger } from '../../utils/logger';
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabBarLabel,
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textTertiary,
-        tabBarIconStyle: styles.tabBarIcon,
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        logger.error('Tab navigation error', error, 'TABS_LAYOUT');
       }}
     >
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabBarLabel,
+          tabBarActiveTintColor: Colors.primary,
+          tabBarInactiveTintColor: Colors.textTertiary,
+          tabBarIconStyle: styles.tabBarIcon,
+        }}
+      >
       <Tabs.Screen
         name="index"
         options={{
@@ -48,6 +55,7 @@ export default function TabsLayout() {
         }}
       />
     </Tabs>
+    </ErrorBoundary>
   );
 }
 
