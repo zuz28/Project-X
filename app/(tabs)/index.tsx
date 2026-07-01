@@ -104,6 +104,14 @@ export default function HomeScreen() {
           >
             <Text style={styles.secondaryButtonText}>New Session</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.insightsButton}
+            onPress={() => router.push('/insights')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.insightsButtonIcon}>💡</Text>
+            <Text style={styles.insightsButtonText}>Health Insights</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Recent Impacts */}
@@ -274,6 +282,25 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: Colors.text,
+    fontSize: Typography.size.base,
+    fontWeight: '600',
+  },
+  insightsButton: {
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Spacing.md,
+  },
+  insightsButtonIcon: {
+    fontSize: 16,
+  },
+  insightsButtonText: {
+    color: Colors.primary,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

@@ -88,6 +88,12 @@ export default function RootLayout() {
             animation: 'slide_from_bottom',
           }}
         />
+        <Stack.Screen
+          name="insights"
+          options={{
+            animation: 'slide_from_bottom',
+          }}
+        />
       </Stack>
       {lastImpact && (
         <ImpactAlert
