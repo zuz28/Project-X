@@ -7,7 +7,6 @@ import { getSessions } from '../services/storage';
 import { bleService } from '../services/ble';
 import { crashReportingService } from '../services/crashReporting';
 import { ImpactAlert } from '../components/ImpactAlert';
-import { NetworkStatusBar } from '../components/NetworkStatusBar';
 import { ErrorBoundary } from '../utils/errorBoundary';
 import { logger } from '../utils/logger';
 
@@ -88,7 +87,6 @@ export default function RootLayout() {
       }}
     >
       <View style={{ flex: 1 }}>
-        <NetworkStatusBar />
         <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
         <Stack
           screenOptions={{
