@@ -32,6 +32,14 @@ export default function SessionDetailScreen() {
     );
   }
 
+  if (session.impacts.length === 0) {
+    return (
+      <View style={[styles.container, styles.center]}>
+        <Text style={styles.loadingText}>No impacts recorded</Text>
+      </View>
+    );
+  }
+
   const sortedImpacts = [...session.impacts].sort((a, b) => b.gForce - a.gForce);
   const maxG = Math.max(...session.impacts.map((i: any) => i.gForce));
   const avgG = (session.impacts.reduce((sum: number, i: any) => sum + i.gForce, 0) / session.impacts.length).toFixed(1);
