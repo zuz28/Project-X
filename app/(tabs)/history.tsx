@@ -129,11 +129,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
     paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.lg,
   },
   sessionBorder: {
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    marginBottom: Spacing.md,
   },
   sessionInfo: {
     flex: 1,
@@ -153,7 +157,7 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   statBadge: {
-    backgroundColor: Colors.backgroundSecondary,
+    backgroundColor: Colors.backgroundTertiary,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
@@ -162,7 +166,9 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: Typography.size.xs,
     color: Colors.textTertiary,
-    fontWeight: '500',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: Typography.labelSpacing,
   },
   statValue: {
     fontSize: Typography.size.base,
