@@ -6,6 +6,7 @@ import { useStore } from '../../store';
 import { generateSession } from '../../services/mockData';
 import { addSession } from '../../services/storage';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../styles/theme';
+import { ScoreRing } from '../../components/ScoreRing';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -40,14 +41,17 @@ export default function HomeScreen() {
   };
 
   // Memoize stats calculations (must run before any early return — Rules of Hooks)
-  const { maxG, flaggedCount, avgG } = useMemo(() => {
+  const { maxG, flaggedCount, avgG, healthScore } = useMemo(() => {
     const impacts = currentSession?.impacts || [];
+    const critical = impacts.filter(i => i.gForce > 60).length;
+    const high = impacts.filter(i => i.gForce > 40 && i.gForce <= 60).length;
     return {
       maxG: impacts.length > 0 ? Math.max(...impacts.map(i => i.gForce)) : 0,
       flaggedCount: impacts.filter(i => i.flagged).length,
       avgG: impacts.length > 0
         ? (impacts.reduce((sum, i) => sum + i.gForce, 0) / impacts.length).toFixed(1)
         : '0',
+      healthScore: Math.max(0, 100 - critical * 20 - high * 5),
     };
   }, [currentSession?.impacts]);
 
@@ -87,6 +91,15 @@ export default function HomeScreen() {
           {isConnected && connectedDeviceName && (
             <Text style={styles.deviceName}>{connectedDeviceName}</Text>
           )}
+        </View>
+
+        {/* Session Health Ring */}
+        <View style={styles.ringContainer}>
+          <ScoreRing
+            score={healthScore}
+            label="Head Health"
+            sublabel="This session"
+          />
         </View>
 
         {/* Main Stats Cards */}
@@ -252,6 +265,10 @@ const styles = StyleSheet.create({
   },
   settingsIcon: {
     fontSize: Typography.size.xl,
+  },
+  ringContainer: {
+    alignItems: 'center',
+    marginBottom: Spacing['2xl'],
   },
   statsContainer: {
     flexDirection: 'row',

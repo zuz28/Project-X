@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, Animated } from 'react-native';
 import { useEffect, useRef, useMemo } from 'react';
 import { useStore } from '../../store';
 import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../styles/theme';
+import { SessionBarChart } from '../../components/SessionBarChart';
 
 export default function AnalyticsScreen() {
   const { sessions, currentSession } = useStore();
@@ -52,6 +53,12 @@ export default function AnalyticsScreen() {
           <StatCard label="Sessions" value={sessions.length.toString()} />
           <StatCard label="Flagged" value={totalFlagged.toString()} highlight={totalFlagged > 0} />
           <StatCard label="Flag Rate" value={`${flaggedPercentage}%`} />
+        </View>
+
+        {/* Impacts per session chart */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Impacts per Session</Text>
+          <SessionBarChart sessions={sessions} />
         </View>
 
         {/* G-Force Statistics */}
