@@ -1,5 +1,29 @@
 # Vela App - Development Notes
 
+## OPEN TODOs (check these first in every session)
+
+1. **Finish real email via EmailJS** — the code integration is DONE
+   (`services/email.ts` supports EmailJS / custom backend / demo fallback,
+   selected via env vars documented in `.env.example`). What remains is the
+   user-side setup: Zac needs to create a free EmailJS account, add a
+   service + template, and paste the three IDs into `.env`. Until then the
+   app runs in demo mode (verification code shown on screen). When Zac asks
+   to "finish email", walk him through the EmailJS steps in `.env.example`.
+2. **Figma design file** — a Figma MCP connector exists but disconnected
+   before the file could be created. When it's connected, build the Vela
+   design file (dark Whoop-style tokens + Login/Home/Analytics/Insights
+   frames) in his drafts (plan key: team::1654368220166342963).
+3. **Real BLE** — helmet connection is still simulated (`services/ble.ts`);
+   needs react-native-ble-plx + the real helmet's protocol spec.
+4. **Cloud backend** — accounts/sessions are on-device only (AsyncStorage);
+   Firebase or Supabase planned for sync/recovery.
+
+Current design language: Whoop-style dark theme — near-black layered
+surfaces, white text, blue (#4A9EFF) accents only, Ionicons, uppercase
+tracked labels, ScoreRing on Home, SessionBarChart in Analytics. Tokens
+live in `styles/theme.ts`. The "Apple light theme" descriptions below are
+historical.
+
 ## Project Overview
 
 Vela is a beautiful Apple-designed mobile app for real-time impact tracking in sports and athletic activities. Built with React Native/Expo, featuring BLE helmet integration, real-time analytics, and personalized health insights.
