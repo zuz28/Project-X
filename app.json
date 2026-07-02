@@ -5,9 +5,15 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "scheme": "vela",
     "platforms": ["ios", "android", "web"],
+    "backgroundColor": "#0B0D10",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0D10"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.vela.app"
@@ -15,7 +21,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0B0D10"
       },
       "package": "com.vela.app"
     },
