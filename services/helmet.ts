@@ -1,5 +1,9 @@
 // Helmet Management Service
-// Tracks helmet information, lifecycle, and usage statistics
+// Tracks helmet information, lifecycle, and usage statistics.
+// Paired helmets are persisted in AsyncStorage so they survive app restarts.
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '../utils/logger';
 
 export interface Helmet {
   id: string;
@@ -15,9 +19,44 @@ export interface Helmet {
   status: 'active' | 'inactive' | 'disconnected';
 }
 
+const HELMETS_KEY = '@vela_helmets';
+
 class HelmetService {
   private helmets: Map<string, Helmet> = new Map();
-  private statusChecks: Map<string, NodeJS.Timeout> = new Map();
+  private statusChecks: Map<string, ReturnType<typeof setInterval>> = new Map();
+  private loaded = false;
+
+  // Load persisted helmets into memory. Safe to call repeatedly.
+  async ensureLoaded(): Promise<void> {
+    if (this.loaded) return;
+    try {
+      const raw = await AsyncStorage.getItem(HELMETS_KEY);
+      if (raw) {
+        const list: Helmet[] = JSON.parse(raw);
+        list.forEach((helmet) => {
+          // Connections never survive a restart
+          if (helmet.status === 'active') {
+            helmet.status = 'inactive';
+          }
+          this.helmets.set(helmet.id, helmet);
+        });
+      }
+    } catch (error) {
+      logger.error('Failed to load helmets', error, 'HELMET');
+    }
+    this.loaded = true;
+  }
+
+  private async persist(): Promise<void> {
+    try {
+      await AsyncStorage.setItem(
+        HELMETS_KEY,
+        JSON.stringify(Array.from(this.helmets.values()))
+      );
+    } catch (error) {
+      logger.error('Failed to save helmets', error, 'HELMET');
+    }
+  }
 
   // Pair new helmet
   async pairHelmet(
@@ -26,6 +65,8 @@ class HelmetService {
     model: string,
     serialNumber: string
   ): Promise<Helmet> {
+    await this.ensureLoaded();
+
     const helmet: Helmet = {
       id: `helmet-${Date.now()}`,
       deviceId,
@@ -42,6 +83,7 @@ class HelmetService {
 
     this.helmets.set(helmet.id, helmet);
     this.startStatusMonitoring(helmet.id);
+    await this.persist();
 
     return helmet;
   }
@@ -62,6 +104,7 @@ class HelmetService {
     if (helmet) {
       helmet.batteryLevel = Math.max(0, Math.min(100, level));
       helmet.lastSeen = Date.now();
+      this.persist();
     }
   }
 
@@ -71,6 +114,7 @@ class HelmetService {
     if (helmet) {
       helmet.status = status;
       helmet.lastSeen = Date.now();
+      this.persist();
     }
   }
 
@@ -80,17 +124,19 @@ class HelmetService {
     if (helmet) {
       helmet.totalImpacts += 1;
       helmet.lastSeen = Date.now();
+      this.persist();
     }
   }
 
   // Unpair helmet
-  unpairHelmet(helmetId: string): void {
+  async unpairHelmet(helmetId: string): Promise<void> {
     const statusCheck = this.statusChecks.get(helmetId);
     if (statusCheck) {
       clearInterval(statusCheck);
       this.statusChecks.delete(helmetId);
     }
     this.helmets.delete(helmetId);
+    await this.persist();
   }
 
   // Start monitoring helmet status
@@ -122,23 +168,20 @@ class HelmetService {
     const helmet = this.helmets.get(helmetId);
     if (!helmet) return null;
 
+    // Grade from best to worst; each issue can only lower the grade.
     let overall: 'excellent' | 'good' | 'fair' | 'poor' = 'excellent';
     const issues: string[] = [];
 
+    if (helmet.status !== 'active') {
+      issues.push('Not connected');
+      overall = 'good';
+    }
     if (helmet.batteryLevel < 20) {
       issues.push('Low battery');
       overall = 'fair';
     }
     if (helmet.batteryLevel < 5) {
       issues.push('Critical battery');
-      overall = 'poor';
-    }
-    if (helmet.status !== 'active') {
-      issues.push('Not connected');
-      overall = overall === 'excellent' ? 'good' : overall;
-    }
-
-    if (issues.length > 0) {
       overall = 'poor';
     }
 

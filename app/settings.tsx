@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useStore } from '../store';
 import { bleService } from '../services/ble';
 import { exportSessionsAsCSV, generateReport } from '../services/export';
+import { saveSessions } from '../services/storage';
 import { logger } from '../utils/logger';
 import { showConfirm, showNotice } from '../utils/dialog';
 import { AUTH_SESSION_KEY } from '../hooks/useAuth';
@@ -81,8 +82,10 @@ export default function SettingsScreen() {
   };
 
   const handleClearData = () => {
-    showConfirm('Clear All Data', 'This action cannot be undone. Are you sure?', () => {
+    showConfirm('Clear All Data', 'This action cannot be undone. Are you sure?', async () => {
       clearAll();
+      // Also wipe persisted session data so it doesn't reappear on reload
+      await saveSessions([]);
       showNotice('Success', 'All data has been cleared');
     }, 'Clear');
   };

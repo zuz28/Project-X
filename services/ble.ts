@@ -1,4 +1,3 @@
-import { NativeEventEmitter, Platform } from 'react-native';
 import { logger } from '../utils/logger';
 
 // BLE Service for Helmet Connectivity

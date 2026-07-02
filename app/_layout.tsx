@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useStore } from '../store';
-import { getSessions } from '../services/storage';
+import { getSessions, saveSessions } from '../services/storage';
 import { bleService } from '../services/ble';
 import { crashReportingService } from '../services/crashReporting';
 import { ImpactAlert } from '../components/ImpactAlert';
@@ -14,7 +14,7 @@ import { loadPersistedSession } from '../hooks/useAuth';
 export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
-  const { isAuthenticated, setUser, setSessions, addImpact, currentSession } = useStore();
+  const { isAuthenticated, setUser, setSessions } = useStore();
   const [lastImpact, setLastImpact] = useState<any>(null);
   const [showAlert, setShowAlert] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -72,19 +72,25 @@ export default function RootLayout() {
 
   const setupBLEListener = () => {
     const unsubscribe = bleService.onImpact((impactData) => {
-      if (currentSession) {
-        const impact = {
-          id: `impact-${Date.now()}`,
-          timestamp: impactData.timestamp,
-          gForce: impactData.gForce,
-          rotational: impactData.rotational,
-          flagged: impactData.gForce > 50,
-        };
+      // Read live state — a closure over render-time values would capture a
+      // stale (often null) currentSession and silently drop every impact.
+      const state = useStore.getState();
+      if (!state.currentSession) return;
 
-        addImpact(impact);
-        setLastImpact(impact);
-        setShowAlert(true);
-      }
+      const impact = {
+        id: `impact-${impactData.timestamp}-${Math.floor(Math.random() * 1e6)}`,
+        timestamp: impactData.timestamp,
+        gForce: impactData.gForce,
+        rotational: impactData.rotational,
+        flagged: impactData.gForce > 50,
+      };
+
+      state.addImpact(impact);
+      setLastImpact(impact);
+      setShowAlert(true);
+
+      // Persist so live impacts survive an app restart
+      saveSessions(useStore.getState().sessions);
     });
 
     return () => unsubscribe();

@@ -8,13 +8,15 @@ import { Colors, Spacing, Radius, Typography, Animation, Shadows } from '../../s
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { currentSession, setCurrentSession, isConnected, connectedDeviceName, user } = useStore();
+  const { currentSession, addSession: addSessionToStore, isConnected, connectedDeviceName, user } = useStore();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!currentSession) {
       const session = generateSession();
-      setCurrentSession(session);
+      // Store action updates both currentSession and the sessions list;
+      // the storage call persists it to disk.
+      addSessionToStore(session);
       addSession(session);
     }
 
@@ -28,7 +30,7 @@ export default function HomeScreen() {
 
   const handleNewSession = async () => {
     const session = generateSession();
-    setCurrentSession(session);
+    addSessionToStore(session);
     await addSession(session);
   };
 

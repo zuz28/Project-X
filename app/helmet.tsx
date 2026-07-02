@@ -27,8 +27,8 @@ export default function HelmetScreen() {
     try {
       setLoading(true);
       setError(null);
-      const allHelmets = helmetService.getAllHelmets();
-      setHelmets(allHelmets);
+      await helmetService.ensureLoaded();
+      setHelmets(helmetService.getAllHelmets());
     } catch (err: any) {
       setError(err.message || 'Failed to load helmets');
     } finally {
@@ -240,8 +240,8 @@ export default function HelmetScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionButton, styles.dangerButton]}
-                  onPress={() => {
-                    helmetService.unpairHelmet(helmet.id);
+                  onPress={async () => {
+                    await helmetService.unpairHelmet(helmet.id);
                     loadHelmets();
                   }}
                   activeOpacity={0.7}

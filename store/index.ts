@@ -66,9 +66,10 @@ export const useStore = create<AppState>((set) => ({
     connectedDeviceName: null,
     connectedHelmetId: null,
   }),
+  // Clears tracking data only — the user stays signed in. Signing out is a
+  // separate action (logout) so "Clear All Data" doesn't strand a stale
+  // persisted login session.
   clearAll: () => set({
-    user: null,
-    isAuthenticated: false,
     sessions: [],
     currentSession: null,
     isConnected: false,
@@ -92,11 +93,16 @@ export const useStore = create<AppState>((set) => ({
   addImpact: (impact) =>
     set((state) => {
       if (!state.currentSession) return state;
+      const updatedSession = {
+        ...state.currentSession,
+        impacts: [impact, ...state.currentSession.impacts],
+      };
       return {
-        currentSession: {
-          ...state.currentSession,
-          impacts: [impact, ...state.currentSession.impacts],
-        },
+        currentSession: updatedSession,
+        // Keep the sessions list in sync so History/Analytics see live impacts
+        sessions: state.sessions.map((s) =>
+          s.id === updatedSession.id ? updatedSession : s
+        ),
         lastImpactTime: impact.timestamp,
       };
     }),
