@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, FlatList } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useStore } from '../../store';
@@ -129,7 +130,7 @@ export default function SessionDetailScreen() {
                   <Text style={styles.rotationalValue}>
                     {(impact.rotational / 1000).toFixed(1)}k rad/s²
                   </Text>
-                  {impact.flagged && <Text style={styles.flagIcon}>⚠️</Text>}
+                  {impact.flagged && <Ionicons name="warning" size={16} color={Colors.accentOrange} />}
                 </View>
               </TouchableOpacity>
             ))}
@@ -268,8 +269,10 @@ const styles = StyleSheet.create({
   summaryLabel: {
     fontSize: Typography.size.xs,
     color: Colors.textTertiary,
-    fontWeight: '500',
-    marginBottom: Spacing.xs,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: Typography.labelSpacing,
+    marginBottom: Spacing.sm,
   },
   summaryValue: {
     fontSize: Typography.size['2xl'],

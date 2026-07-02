@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useNetwork } from '../hooks/useNetwork';
 import { Colors, Spacing, Typography } from '../styles/theme';
 
@@ -28,7 +29,7 @@ export function NetworkStatusBar() {
         },
       ]}
     >
-      <Text style={styles.icon}>📡</Text>
+      <Ionicons name="cloud-offline-outline" size={18} color={Colors.textOnAccent} />
       <Text style={styles.text}>No internet connection</Text>
       <Text style={styles.subtext}>Some features may be unavailable</Text>
     </Animated.View>
@@ -49,12 +50,12 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
   subtext: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.xs,
     opacity: 0.8,
   },

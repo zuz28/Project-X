@@ -88,7 +88,7 @@ export default function ImpactDetailScreen() {
           </View>
           {impact.flagged && (
             <View style={styles.flagBadge}>
-              <Text style={styles.flagText}>⚠️ Flagged</Text>
+              <Text style={styles.flagText}>Flagged</Text>
             </View>
           )}
         </View>
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   flagText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   viewSessionButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

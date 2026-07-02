@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, Radius, Typography, Shadows } from '../styles/theme';
 
 interface ImpactAlertProps {
@@ -73,9 +74,11 @@ export function ImpactAlert({ gForce, timestamp, visible }: ImpactAlertProps) {
           isHigh && !isCritical && styles.alertHigh,
         ]}
       >
-        <Text style={styles.icon}>
-          {isCritical ? '🚨' : isHigh ? '⚠️' : '📊'}
-        </Text>
+        <Ionicons
+          name={isCritical ? 'alert-circle' : isHigh ? 'warning' : 'pulse'}
+          size={24}
+          color={isCritical || isHigh ? Colors.textOnAccent : Colors.primary}
+        />
         <View style={styles.content}>
           <Text style={[styles.title, (isCritical || isHigh) && styles.lightText]}>Impact Detected</Text>
           <Text style={[styles.gForce, (isCritical || isHigh) && styles.lightText]}>{gForce}G</Text>
@@ -116,10 +119,10 @@ const styles = StyleSheet.create({
     borderLeftColor: Colors.accentOrange,
   },
   lightText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
   },
   lightSeverity: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     opacity: 0.9,
   },
   icon: {

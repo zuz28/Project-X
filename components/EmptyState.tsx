@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     ...Shadows.md,
   },
   buttonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

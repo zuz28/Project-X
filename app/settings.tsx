@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, Switch } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
@@ -115,10 +116,13 @@ export default function SettingsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
+            testID="close-button"
+            accessible
+            accessibilityLabel="Close"
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Text style={styles.closeButton}>✕</Text>
+            <Ionicons name="close" size={26} color={Colors.text} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Settings</Text>
@@ -425,7 +429,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   connectDeviceButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -480,7 +484,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   thresholdButtonTextActive: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
   },
   dangerBox: {
     backgroundColor: Colors.accentRed,
@@ -491,7 +495,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dangerButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -499,7 +503,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.lg,
     fontSize: Typography.size.xs,
-    color: Colors.background,
+    color: Colors.textOnAccent,
     opacity: 0.8,
     textAlign: 'center',
   },
@@ -544,7 +548,7 @@ const styles = StyleSheet.create({
   profileIconText: {
     fontSize: Typography.size['2xl'],
     fontWeight: '700',
-    color: Colors.background,
+    color: Colors.textOnAccent,
   },
   profileInfo: {
     flex: 1,

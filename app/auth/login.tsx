@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../hooks/useAuth';
@@ -57,7 +58,7 @@ export default function LoginScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.icon}>🏛️</Text>
+          <Ionicons name="shield-half" size={52} color={Colors.text} />
           <Text style={styles.title}>Welcome Back</Text>
           <Text style={styles.subtitle}>Sign in to your Vela account</Text>
         </View>
@@ -109,7 +110,7 @@ export default function LoginScreen() {
               {demoCode !== '' && (
                 <View style={styles.demoBanner}>
                   <Text style={styles.demoBannerText}>
-                    📧 Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
+                    Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
                   </Text>
                 </View>
               )}
@@ -243,7 +244,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

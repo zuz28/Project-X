@@ -3,20 +3,9 @@ import { useEffect, useRef } from 'react';
 import { Colors, Spacing, Typography, Animation } from '../styles/theme';
 
 export function LoadingScreen() {
-  const rotateAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    // Rotation animation
-    Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 2000,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      })
-    ).start();
-
     // Pulse animation
     Animated.loop(
       Animated.sequence([
@@ -36,24 +25,18 @@ export function LoadingScreen() {
     ).start();
   }, []);
 
-  const spin = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
   return (
     <View style={styles.container}>
       <Animated.Text
         style={[
-          styles.icon,
+          styles.title,
           {
-            transform: [{ rotate: spin }, { scale: pulseAnim }],
+            transform: [{ scale: pulseAnim }],
           },
         ]}
       >
-        🏛️
+        VELA
       </Animated.Text>
-      <Text style={styles.title}>Vela</Text>
       <Text style={styles.subtitle}>Initializing...</Text>
       <View style={styles.dotsContainer}>
         <Animated.View style={styles.dot} />
@@ -71,14 +54,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: Colors.background,
   },
-  icon: {
-    fontSize: 56,
-    marginBottom: Spacing.lg,
-  },
   title: {
     fontSize: Typography.size['5xl'],
     fontWeight: '700',
     color: Colors.text,
+    letterSpacing: 6,
     marginBottom: Spacing.sm,
   },
   subtitle: {

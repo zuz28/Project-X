@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../hooks/useAuth';
@@ -60,7 +61,7 @@ export default function SignupScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.icon}>🏛️</Text>
+          <Ionicons name="shield-half" size={52} color={Colors.text} />
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Join Vela today</Text>
         </View>
@@ -146,7 +147,7 @@ export default function SignupScreen() {
               {demoCode !== '' && (
                 <View style={styles.demoBanner}>
                   <Text style={styles.demoBannerText}>
-                    📧 Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
+                    Demo mode — no email service connected yet.{'\n'}Your code: {demoCode}
                   </Text>
                 </View>
               )}
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   buttonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

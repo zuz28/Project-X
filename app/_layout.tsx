@@ -110,7 +110,7 @@ export default function RootLayout() {
       }}
     >
       <View style={{ flex: 1 }}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <Stack
           screenOptions={{
             headerShown: false,

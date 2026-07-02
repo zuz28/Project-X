@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
@@ -50,10 +51,13 @@ export default function InsightsScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
+            testID="close-button"
+            accessible
+            accessibilityLabel="Close"
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Text style={styles.closeButton}>✕</Text>
+            <Ionicons name="close" size={26} color={Colors.text} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Health Insights</Text>
@@ -65,7 +69,7 @@ export default function InsightsScreen() {
         <View style={styles.section}>
           <View style={styles.healthScoreBox}>
             <Text style={styles.scoreLabel}>Overall Health Score</Text>
-            <Text style={styles.scoreValue}>
+            <Text style={[styles.scoreValue, { color: getScoreColor(criticalImpacts.length, highImpacts.length) }]}>
               {getHealthScore(criticalImpacts.length, highImpacts.length)}
             </Text>
             <View style={styles.scoreBar}>
@@ -75,8 +79,9 @@ export default function InsightsScreen() {
                   {
                     width: `${Math.max(
                       0,
-                      100 - criticalImpacts.length * 10 - highImpacts.length * 5
+                      100 - criticalImpacts.length * 20 - highImpacts.length * 5
                     )}%`,
+                    backgroundColor: getScoreColor(criticalImpacts.length, highImpacts.length),
                   },
                 ]}
               />
@@ -95,25 +100,25 @@ export default function InsightsScreen() {
               label="Critical Impacts"
               value={criticalImpacts.length.toString()}
               color={Colors.accentRed}
-              icon="🚨"
+              icon="alert-circle"
             />
             <RiskCard
               label="High Impacts"
               value={highImpacts.length.toString()}
               color={Colors.accentOrange}
-              icon="⚠️"
+              icon="warning"
             />
             <RiskCard
               label="Today's Impacts"
               value={todayImpacts.length.toString()}
               color={Colors.primary}
-              icon="📊"
+              icon="stats-chart"
             />
             <RiskCard
               label="Total Impacts"
               value={allImpacts.length.toString()}
               color={Colors.textTertiary}
-              icon="📈"
+              icon="trending-up"
             />
           </View>
         </View>
@@ -170,11 +175,11 @@ function RiskCard({
   label: string;
   value: string;
   color: string;
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
 }) {
   return (
     <View style={styles.riskCard}>
-      <Text style={styles.riskIcon}>{icon}</Text>
+      <Ionicons name={icon} size={26} color={color} style={styles.riskIconSpacing} />
       <Text style={styles.riskValue}>{value}</Text>
       <Text style={[styles.riskLabel, { color }]}>{label}</Text>
     </View>
@@ -223,6 +228,13 @@ function TipCard({ title, tips }: { title: string; tips: string[] }) {
 function getHealthScore(critical: number, high: number): string {
   const score = Math.max(0, 100 - critical * 20 - high * 5);
   return score.toFixed(0);
+}
+
+function getScoreColor(critical: number, high: number): string {
+  const score = Math.max(0, 100 - critical * 20 - high * 5);
+  if (score < 40) return Colors.accentRed;
+  if (score < 70) return Colors.accentOrange;
+  return Colors.accentGreen;
 }
 
 function getHealthMessage(critical: number, high: number): string {
@@ -403,8 +415,7 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     alignItems: 'center',
   },
-  riskIcon: {
-    fontSize: 32,
+  riskIconSpacing: {
     marginBottom: Spacing.md,
   },
   riskValue: {

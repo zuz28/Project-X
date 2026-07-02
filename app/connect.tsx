@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, ActivityIndicator, TextInput } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
@@ -121,10 +122,13 @@ export default function ConnectScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
+            testID="close-button"
+            accessible
+            accessibilityLabel="Close"
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Text style={styles.closeButton}>✕</Text>
+            <Ionicons name="close" size={26} color={Colors.text} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Connect Helmet</Text>
@@ -157,7 +161,7 @@ export default function ConnectScreen() {
                   </>
                 ) : (
                   <>
-                    <Text style={styles.scanButtonIcon}>🔍</Text>
+                    <Ionicons name="bluetooth" size={18} color={Colors.textOnAccent} />
                     <Text style={styles.scanButtonText}>Scan for Devices</Text>
                   </>
                 )}
@@ -379,7 +383,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   scanButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -543,7 +547,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   modelButtonTextActive: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
   },
   pairButton: {
     backgroundColor: Colors.primary,
@@ -557,7 +561,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   pairButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

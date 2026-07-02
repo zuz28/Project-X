@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../../store';
@@ -66,7 +67,7 @@ export default function AlertsScreen() {
               activeOpacity={0.7}
             >
               <View style={styles.alertIcon}>
-                <Text style={styles.alertIconText}>⚠️</Text>
+                <Ionicons name="warning" size={22} color={Colors.accentOrange} />
               </View>
               <View style={styles.alertInfo}>
                 <Text style={styles.alertG}>{impact.gForce}G Impact</Text>

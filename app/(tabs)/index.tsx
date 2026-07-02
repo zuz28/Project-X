@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useEffect, useRef, useMemo } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useStore } from '../../store';
 import { generateSession } from '../../services/mockData';
@@ -73,11 +74,14 @@ export default function HomeScreen() {
               <Text style={styles.headerSubtitle}>Session Tracking</Text>
             </View>
             <TouchableOpacity
+              testID="settings-button"
+              accessible
+              accessibilityLabel="Settings"
               style={styles.settingsButton}
               onPress={() => router.push('/settings')}
               activeOpacity={0.7}
             >
-              <Text style={styles.settingsIcon}>⚙️</Text>
+              <Ionicons name="settings-outline" size={24} color={Colors.text} />
             </TouchableOpacity>
           </View>
           {isConnected && connectedDeviceName && (
@@ -104,9 +108,11 @@ export default function HomeScreen() {
             onPress={handleConnectPress}
             activeOpacity={0.7}
           >
-            <Text style={styles.primaryButtonIcon}>
-              {isConnected ? '✓' : '🔗'}
-            </Text>
+            <Ionicons
+              name={isConnected ? 'checkmark-circle' : 'bluetooth'}
+              size={18}
+              color={Colors.textOnAccent}
+            />
             <Text style={styles.primaryButtonText}>
               {isConnected ? 'Helmet Connected' : 'Connect Helmet'}
             </Text>
@@ -129,7 +135,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/insights')}
             activeOpacity={0.7}
           >
-            <Text style={styles.insightsButtonIcon}>💡</Text>
+            <Ionicons name="pulse" size={18} color={Colors.primary} />
             <Text style={styles.insightsButtonText}>Health Insights</Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -140,7 +146,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/helmet')}
             activeOpacity={0.7}
           >
-            <Text style={styles.helmetButtonIcon}>🪖</Text>
+            <Ionicons name="shield-half-outline" size={18} color={Colors.primary} />
             <Text style={styles.helmetButtonText}>Your Helmets</Text>
           </TouchableOpacity>
         </View>
@@ -161,7 +167,7 @@ export default function HomeScreen() {
                   {new Date(impact.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
               </View>
-              {impact.flagged && <Text style={styles.flagIcon}>⚠️</Text>}
+              {impact.flagged && <Ionicons name="warning" size={18} color={Colors.accentOrange} />}
             </TouchableOpacity>
           ))}
         </View>
@@ -257,18 +263,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.backgroundSecondary,
     borderRadius: Radius.lg,
-    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.sm,
     justifyContent: 'center',
     alignItems: 'center',
   },
   statLabel: {
     fontSize: Typography.size.xs,
     color: Colors.textTertiary,
-    fontWeight: '500',
-    marginBottom: Spacing.xs,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: Typography.labelSpacing,
+    marginBottom: Spacing.sm,
   },
   statValue: {
-    fontSize: Typography.size.xl,
+    fontSize: Typography.size['2xl'],
     fontWeight: '700',
     color: Colors.text,
   },
@@ -295,11 +306,11 @@ const styles = StyleSheet.create({
   },
   primaryButtonIcon: {
     fontSize: Typography.size.base,
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontWeight: '600',
   },
   primaryButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -322,7 +333,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: Colors.border,
     flexDirection: 'row',
     justifyContent: 'center',
     gap: Spacing.md,
@@ -331,17 +342,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   insightsButtonText: {
-    color: Colors.primary,
+    color: Colors.text,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
   helmetButton: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.backgroundSecondary,
     borderRadius: Radius.lg,
     paddingVertical: Spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: Colors.primary,
+    borderColor: Colors.border,
     flexDirection: 'row',
     justifyContent: 'center',
     gap: Spacing.md,
@@ -350,7 +361,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   helmetButtonText: {
-    color: Colors.primary,
+    color: Colors.text,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },

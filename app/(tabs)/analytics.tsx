@@ -150,8 +150,10 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: Typography.size.xs,
     color: Colors.textTertiary,
-    fontWeight: '500',
-    marginBottom: Spacing.xs,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: Typography.labelSpacing,
+    marginBottom: Spacing.sm,
   },
   statValue: {
     fontSize: Typography.size.xl,

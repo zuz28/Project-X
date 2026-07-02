@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { useStore } from '../store';
@@ -51,10 +52,13 @@ export default function HelmetScreen() {
         >
           <View style={styles.header}>
             <TouchableOpacity
+              testID="close-button"
+              accessible
+              accessibilityLabel="Close"
               onPress={() => router.back()}
               activeOpacity={0.7}
             >
-              <Text style={styles.closeButton}>✕</Text>
+              <Ionicons name="close" size={26} color={Colors.text} />
             </TouchableOpacity>
             <View style={styles.headerContent}>
               <Text style={styles.headerTitle}>Your Helmets</Text>
@@ -78,17 +82,20 @@ export default function HelmetScreen() {
         >
           <View style={styles.header}>
             <TouchableOpacity
+              testID="close-button"
+              accessible
+              accessibilityLabel="Close"
               onPress={() => router.back()}
               activeOpacity={0.7}
             >
-              <Text style={styles.closeButton}>✕</Text>
+              <Ionicons name="close" size={26} color={Colors.text} />
             </TouchableOpacity>
             <View style={styles.headerContent}>
               <Text style={styles.headerTitle}>Your Helmets</Text>
             </View>
           </View>
           <View style={[styles.container, styles.emptyContainer]}>
-            <Text style={styles.emptyIcon}>⚠️</Text>
+            <Ionicons name="warning" size={56} color={Colors.accentOrange} style={{ marginBottom: Spacing.lg }} />
             <Text style={styles.emptyTitle}>Error</Text>
             <Text style={styles.emptyDescription}>{error}</Text>
             <TouchableOpacity
@@ -114,10 +121,13 @@ export default function HelmetScreen() {
         >
           <View style={styles.header}>
             <TouchableOpacity
+              testID="close-button"
+              accessible
+              accessibilityLabel="Close"
               onPress={() => router.back()}
               activeOpacity={0.7}
             >
-              <Text style={styles.closeButton}>✕</Text>
+              <Ionicons name="close" size={26} color={Colors.text} />
             </TouchableOpacity>
             <View style={styles.headerContent}>
               <Text style={styles.headerTitle}>Your Helmets</Text>
@@ -125,7 +135,7 @@ export default function HelmetScreen() {
           </View>
 
           <View style={[styles.container, styles.emptyContainer]}>
-            <Text style={styles.emptyIcon}>🪖</Text>
+            <Ionicons name="shield-half-outline" size={56} color={Colors.textTertiary} style={{ marginBottom: Spacing.lg }} />
             <Text style={styles.emptyTitle}>No Helmets Yet</Text>
             <Text style={styles.emptyDescription}>
               Connect your Vela helmet to start tracking impacts
@@ -153,10 +163,13 @@ export default function HelmetScreen() {
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
+            testID="close-button"
+            accessible
+            accessibilityLabel="Close"
             onPress={() => router.back()}
             activeOpacity={0.7}
           >
-            <Text style={styles.closeButton}>✕</Text>
+            <Ionicons name="close" size={26} color={Colors.text} />
           </TouchableOpacity>
           <View style={styles.headerContent}>
             <Text style={styles.headerTitle}>Your Helmets</Text>
@@ -343,7 +356,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   buttonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -381,7 +394,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
   },
   connectedText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.xs,
     fontWeight: '600',
   },
@@ -478,7 +491,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionButtonText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.sm,
     fontWeight: '600',
   },

@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing['2xl'],
   },
   primaryText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
@@ -124,12 +124,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   dangerText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
   successText: {
-    color: Colors.background,
+    color: Colors.textOnAccent,
     fontSize: Typography.size.base,
     fontWeight: '600',
   },
